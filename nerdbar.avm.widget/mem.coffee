@@ -6,7 +6,7 @@ render: (output) ->
   "mem <span>#{output}</span>"
 
 style: """
-  color: #444
+  color: #555
   font: 12px Osaka-Mono
   right: 197px
   top: 6px
