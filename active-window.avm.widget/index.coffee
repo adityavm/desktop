@@ -2,7 +2,7 @@ options =
   refresh: 1000
   cutOff: 60
 
-command: "osascript active-window.widget/lib/window_title.scpt"
+command: "osascript active-window.avm.widget/lib/window_title.scpt"
 
 refreshInterval: 1000,
 
