@@ -7,7 +7,7 @@ command: "osascript active-window.avm.widget/lib/window_title.scpt"
 refreshInterval: 1000,
 
 render: (output) ->
-  split = output.match /(.+),(.+)/
+  split = output.match /([^,]+),(.+)/
   win = split[1].trim()
   title = split[2].trim()
   titleSubs = if title.length > options.cutOff then "&hellip;" + title.substr title.length - options.cutOff, title.length else title
