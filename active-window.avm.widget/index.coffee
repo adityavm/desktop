@@ -1,7 +1,7 @@
 # public
 
 options =
-  refresh: 1000
+  refresh: 500
   cutOff: 60
 
 # internal
@@ -10,14 +10,14 @@ outputFmt = (output) ->
   split = output.match /([^,]+),(.+)/
   win = split[1].trim()
   title = split[2].trim()
-  titleSubs = if title.length > options.cutOff then "&hellip;" + title.substr title.length - options.cutOff, title.length else title
+  titleSubs = if title.length > options.cutOff then "..." + title.substr title.length - options.cutOff, title.length else title
 
   windowSpan = "<span class='window'>#{win}</span>"
   titleSpan = "<span class='title'>#{titleSubs}</span>"
 
   out = "#{windowSpan}"
   if titleSubs
-    out += " / #{titleSpan}"
+    out += " <span class='divider'>/</span> #{titleSpan}"
 
   return [win, title, titleSubs, out]
 
@@ -25,10 +25,10 @@ outputFmt = (output) ->
 
 command: "osascript active-window.avm.widget/lib/window_title.scpt"
 
-refreshInterval: 1000,
+refreshInterval: options.refresh,
 
 render: (output) ->
-  "<div class='content empty'></div>"
+  "<div class='content'></div>"
 
 update: (output, domEl) ->
   [win, title, titleSubs, html] = outputFmt output
@@ -37,8 +37,22 @@ update: (output, domEl) ->
 
   if (win == "Finder" and title == "")
     el.addClass("empty").html("")
-  else
-    el.removeClass("empty").html(html)
+    return
+
+  el.removeClass("empty")
+
+  domText = el.text()
+  newText = "#{win} / #{titleSubs}"
+  oldWin = el.find(".window").text()
+
+  # animate if different window + title is different
+  if win != oldWin
+    if domText != newText
+      el.addClass("transit")
+
+  el.html(html)
+
+  if el.hasClass("transit") then setTimeout (() -> el.removeClass("transit")), 200
 
 style: """
   .content
@@ -54,7 +68,14 @@ style: """
     min-width: 200px
     white-space: nowrap
     opacity: 1
-    transition: opacity 0.4s
+    transition: opacity 0.2s
+
+  .content > span
+    opacity: 1
+    transition: opacity 0.2s
+
+  .transit > span
+    opacity: 0
 
   .empty
     opacity: 0
