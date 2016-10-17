@@ -1,22 +1,17 @@
+# public
+
 options =
   refresh: 1000
   cutOff: 60
 
-command: "osascript active-window.avm.widget/lib/window_title.scpt"
+# internal
 
-refreshInterval: 1000,
-
-render: (output) ->
+outputFmt = (output) ->
   split = output.match /([^,]+),(.+)/
   win = split[1].trim()
   title = split[2].trim()
   titleSubs = if title.length > options.cutOff then "&hellip;" + title.substr title.length - options.cutOff, title.length else title
 
-  # let greeter take over if on desktop
-  if win == "Finder" and title == ""
-    return "<div class='content empty'></div>"
-
-  # else show window + title
   windowSpan = "<span class='window'>#{win}</span>"
   titleSpan = "<span class='title'>#{titleSubs}</span>"
 
@@ -24,7 +19,26 @@ render: (output) ->
   if titleSubs
     out += " / #{titleSpan}"
 
-  return "<div class='content'>#{out}</div>"
+  return [win, title, titleSubs, out]
+
+# widget
+
+command: "osascript active-window.avm.widget/lib/window_title.scpt"
+
+refreshInterval: 1000,
+
+render: (output) ->
+  "<div class='content empty'></div>"
+
+update: (output, domEl) ->
+  [win, title, titleSubs, html] = outputFmt output
+
+  el = $(domEl).find(".content")
+
+  if (win == "Finder" and title == "")
+    el.addClass("empty").html("")
+  else
+    el.removeClass("empty").html(html)
 
 style: """
   .content
@@ -39,10 +53,11 @@ style: """
     line-height: 26px
     min-width: 200px
     white-space: nowrap
+    opacity: 1
+    transition: opacity 0.4s
 
   .empty
-    min-width: 0
-    height: 0
+    opacity: 0
 
   span.window
     color: #aaa

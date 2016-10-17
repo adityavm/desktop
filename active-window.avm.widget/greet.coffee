@@ -1,11 +1,11 @@
 command: "date +%H"
 
-refreshInterval: 60000,
+refreshInterval: "30m"
 
 render: (output) ->
   time = parseInt output
 
-  if time > 0 and time < 6
+  if time >= 0 and time < 6
     greet = "You should sleep"
 
   if time >= 6 and time < 12
