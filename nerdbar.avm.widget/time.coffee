@@ -16,7 +16,9 @@ render: (output) ->
 
 style: """
   color: #95c25b
-  font: 12px "SFNS Display", Osaka-Mono, Hack, Inconsolata
+  font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata
   right: 15px
-  top: 6px
+  top: 0
+  height: 26px
+  line-height: 26px
 """

@@ -59,7 +59,7 @@ style: """
     position: absolute
     top: 0
     left: 10px
-    font: 12px "SFNS Display", Osaka-Mono, Hack, Inconsolata
+    font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata
     color: #555
     z-index: 2
     height: 26px
