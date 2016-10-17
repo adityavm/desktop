@@ -25,7 +25,7 @@ style: """
 		color: #8EC620
 
 		&.discharging
-			background-color: #C5992C
+			background-color: #ecb512
 			color: #333
 			padding: 0 5px
 
@@ -33,13 +33,13 @@ style: """
 				color: rgba(#000, 0.25)
 
 		&.charging
-			color: #C5992C
+			color: #ecb512
 
 		&.finishing.charge
-			color: #B5C625
+			color: #b5c625
 
 		&.charged
-			color: #8EC620
+			color: #88c625
 
 	span.label
 		color: #555

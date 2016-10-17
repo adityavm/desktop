@@ -6,7 +6,7 @@ render: (output) ->
   "#{output}"
 
 style: """
-  color: #B16286
+  color: #ee6aa0
   font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata
   right: 65px
   top: 0

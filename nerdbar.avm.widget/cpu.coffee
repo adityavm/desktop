@@ -24,11 +24,11 @@ style: """
   line-height: 26px
 
   span.green
-    color: #7AAB7E
+    color: #88c625
 
   span.orange
-    color: #b6711f
+    color: #ff8000
 
   span.red
-    color: #d11c1c
+    color: #ec3f1d
 """

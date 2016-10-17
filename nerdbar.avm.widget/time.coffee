@@ -15,7 +15,7 @@ render: (output) ->
 	"#{hrs}:#{min}#{suffix}"
 
 style: """
-  color: #95c25b
+  color: #94d5e4
   font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata
   right: 15px
   top: 0
