@@ -20,7 +20,7 @@ render: (output) ->
   out = "#{greet}, Aditya!"
 
 style: """
-  font: 13px Osaka-Mono
+  font: 12px "SFNS Display", Osaka-Mono, Hack, Inconsolata
   color: #aaa
   top: 6px
   left: 10px

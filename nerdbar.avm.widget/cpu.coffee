@@ -17,7 +17,7 @@ render: (output) ->
 
 style: """
   color: #555
-  font: 12px Osaka-Mono
+  font: 12px "SFNS Display", Osaka-Mono, Hack, Inconsolata
   right: 262px
   top: 6px
 

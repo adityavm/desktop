@@ -6,8 +6,8 @@ render: (output) ->
   "<i>⚡</i>#{output}"
 
 style: """
-  font: 12px Osaka-Mono
-  top: 4px
+  font: 12px "SFNS Display", Osaka-Mono, Hack, Inconsolata
+  top: 6px
   right: 140px
   color: #FABD2F
   span
