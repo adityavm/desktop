@@ -10,13 +10,13 @@ Make sure you have [Übersicht](http://tracesof.net/uebersicht/) installed.
 
 Then clone this repository.
 
-## Dependency
-
-bitbar-plugins . usage.js
-
 ```bash
 git clone https://gitlab.com/adityavm/ubersicht-widgets.git $HOME/Library/Application\ Support/Übersicht/widgets/nerdbar.widget
 ```
+
+## Dependency
+
+bitbar-plugins . usage.js
 
 ## Credits
 
