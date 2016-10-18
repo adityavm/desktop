@@ -1,8 +1,9 @@
-command: "pmset -g batt | egrep '([0-9]+\%).*' -o --colour=auto | cut -f1 -d';'"
+#
+# internal
+#
 
-refreshFrequency: 150000 # ms
-
-render: (output) ->
+# width class based on output value
+getWidthCls = (output) ->
   widthCls = ""
   outputInt = parseInt output
 
@@ -12,22 +13,36 @@ render: (output) ->
   if outputInt >= 75 then widthCls = "w75"
   if outputInt == 100 then widthCls = "w100"
 
+  widthCls
+
+#
+# widget
+#
+
+command: "pmset -g batt | egrep '([0-9]+\%).*' -o --colour=auto | cut -f1 -d';'"
+
+refreshFrequency: "3m" # ms
+
+render: (output) ->
   """
   <span class='content'>
     <span class='label text'>
-      <span class='battery icon #{widthCls}'></span>
+      <span class='battery icon'></span>
       <span class='text'>bat</span>
     </span>
     <span class='charge'>#{output}</span>
   </span>
   """
 
-afterRender: (domEl) ->
-  out = ""
+update: (output, domEl) ->
+  widthCls = getWidthCls output
+
+  $(domEl).find(".battery.icon").addClass widthCls
+  $(domEl).find(".charge").text output
 
   @run "pmset -g batt", (err, resp) ->
     out = resp.split ";"
-    $(domEl).find(".content").addClass(out[1])
+    $(domEl).find(".content").removeClass("discharging chargin finishing charge charged").addClass(out[1])
 
 style: """
   font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata
@@ -39,7 +54,7 @@ style: """
     display: inline-block
     line-height: 26px
     height: 26px
-    color: #8EC620
+    color: #fff
     padding: 0 3px 0 5px
 
     &.discharging
@@ -99,25 +114,25 @@ style: """
       &:after
         content: ''
         position: absolute
-        left: 1px
-        top: 1px
-        width: 11px
-        height: 5px
+        left: 0
+        top: 0
+        height: 7px
+        width: 0
         background-color: currentColor
+        transition: width 0.2s
 
       &.w0:after
         width: 1px
 
       &.w25:after
-        width: 3px
+        width: 4px
 
       &.w50:after
-        width: 5.5px
+        width: 7px
 
       &.w75:after
-        width: 8px
+        width: 10px
 
       &.w100:after
-        width: 11px
-
+        width: 13px
 """
