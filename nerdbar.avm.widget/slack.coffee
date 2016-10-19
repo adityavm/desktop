@@ -24,7 +24,7 @@ handle = (typ, msg) ->
 	console.log msg
 
 	# if non-message or message from self
-	if typ != "message" or msg.user == "U0AKA4LA1" then return
+	if typ != "message" or msg.user == cfg.SLACK_SELF_ID then return
 
 	if msg.type == "message"
 		if !!impChannelsID[msg.channel]
@@ -91,7 +91,10 @@ unreadMsgs = () ->
 # widget
 #
 
-command: "curl -s https://slack.com/api/rtm.start?token=xoxp-2917105190-10656156341-44919868884-8ab6fab54c&simple_latest=true"
+command: (cb) ->
+	self = this
+	$.getScript "nerdbar.avm.widget/lib/cfg.js", (data) ->
+		self.run("""curl -s https://slack.com/api/rtm.start?token=#{cfg.SLACK_TOKEN}&simple_latest=true""", cb)
 
 refreshFrequency: false
 
