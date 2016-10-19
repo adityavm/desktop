@@ -28,7 +28,7 @@ handle = (typ, msg) ->
 	if typ != "message" or msg.user == cfg.SLACK_SELF_ID then return
 
 	if msg.type == "message"
-		if msg.subtype != "message_deleted" or msg.subtype != "message_changed"
+		if msg.subtype != "message_deleted" and msg.subtype != "message_changed"
 			if !!impChannelsID[msg.channel]
 				impChannelsID[msg.channel].unread_count += 1
 
