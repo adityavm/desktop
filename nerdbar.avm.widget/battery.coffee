@@ -47,7 +47,7 @@ update: (output, domEl) ->
 style: """
   font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata
   top: 0
-  right: 140px
+  right: 141.5px
   height: 26px
 
   span.content
