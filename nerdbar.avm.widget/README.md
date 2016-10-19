@@ -14,6 +14,15 @@ Then clone this repository.
 git clone https://gitlab.com/adityavm/ubersicht-widgets.git $HOME/Library/Application\ Support/Übersicht/widgets/nerdbar.widget
 ```
 
+Also needs a `lib/cfg.js` to run the Slack widget. The config should be defined as:
+
+```javascript
+var cfg = {
+	SLACK_TOKEN: "xxxxxxxxx...",
+	SLACK_SELF_ID: "yyyyyyyy"
+}
+```
+
 ## Dependency
 
 bitbar-plugins . usage.js
