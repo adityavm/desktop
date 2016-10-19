@@ -23,7 +23,12 @@ init = (url) ->
 handle = (typ, msg) ->
 	console.log msg
 
-	if typ != "message" then return
+	# if non-message or message from self
+	if typ != "message" or msg.user == "U0AKA4LA1" then return
+
+	if msg.type == "message"
+		if !!impChannelsID[msg.channel]
+			impChannelsID[msg.channel].unread_count += 1
 
 	if msg.type == "channel_marked" or msg.type == "group_marked"
 		console.log """channel #{msg.channel}"""
