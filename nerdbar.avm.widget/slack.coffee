@@ -28,8 +28,9 @@ handle = (typ, msg) ->
 	if typ != "message" or msg.user == cfg.SLACK_SELF_ID then return
 
 	if msg.type == "message"
-		if !!impChannelsID[msg.channel]
-			impChannelsID[msg.channel].unread_count += 1
+		if msg.subtype != "message_deleted" or msg.subtype != "message_changed"
+			if !!impChannelsID[msg.channel]
+				impChannelsID[msg.channel].unread_count += 1
 
 	if msg.type == "channel_marked" or msg.type == "group_marked"
 		console.log """channel #{msg.channel}"""
