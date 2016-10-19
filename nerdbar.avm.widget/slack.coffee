@@ -2,6 +2,7 @@
 # globals
 #
 
+impTypes = ["im"]
 impChannels = ["dev", "product", "design-ux", "bug-report"]
 impChannelsID = {}
 domEl = null
@@ -59,11 +60,14 @@ updateOnMsg = (chn, msg) ->
 	unreadMsgsCount = if msg then msg else unreadMsgs()
 
 	# reset
-	els.unread.removeClass("very-busy busy")
+	els.unread.removeClass("important very-busy busy")
 
 	# set
 	if unreadChannelsCount > 0
+		# choose how to highlight
 		hlCls = if unreadChannelsCount > 5 or unreadMsgsCount > 20 then "very-busy" else "busy"
+		hlCls = if haveImportant() then "important" else hlCls
+
 		els.unread.addClass(hlCls)
 		els.channels.text(unreadChannelsCount)
 		els.count.text(unreadMsgsCount)
@@ -71,6 +75,21 @@ updateOnMsg = (chn, msg) ->
 	else
 		$(domEl).removeClass("show")
 
+# type channel
+getType = (e) ->
+	if e.is_channel then return "channel"
+	if e.is_group then return "group"
+	if e.is_im then return "im"
+
+# have important messages?
+haveImportant = () ->
+	imp = false
+	for ch, val of impChannelsID
+		if val.unread_count > 0
+			if impTypes.indexOf(val.type) > -1
+				imp = true
+				break
+	return imp
 
 # get unread channels count
 unreadChannels = () ->
@@ -110,6 +129,7 @@ render: (output) ->
 		.concat(json.ims)
 		.map((c) ->
 			impChannelsID[c.id] =
+				type: getType(c)
 				name: c.name
 				unread_count: c.unread_count
 		)
@@ -169,6 +189,9 @@ style: """
 
 		&.busy .channels
 			color: #ecb512
+
+		&.important .channels
+			color: #df1d1d
 
 		.count
 			font-size: 10px
