@@ -7,6 +7,7 @@ impChannels = ["dev", "product", "design-ux", "bug-report"]
 impChannelsID = {}
 domEl = null
 socket = null
+retry = null
 
 
 # initialise socket
@@ -24,8 +25,8 @@ init = (url) ->
 handle = (typ, msg) ->
 	console.log msg
 
-	# if non-message or message from self
-	if typ != "message" or msg.user == cfg.SLACK_SELF_ID then return
+	# if non-message, message from self or bot
+	if typ != "message" or msg.user == cfg.SLACK_SELF_ID or msg.bot_id then return
 
 	if msg.type == "message"
 		if msg.subtype != "message_deleted" and msg.subtype != "message_changed"
@@ -47,6 +48,7 @@ handle = (typ, msg) ->
 	updateOnMsg()
 
 	if msg.type != "message" then return
+
 
 # update dom
 updateOnMsg = (chn, msg) ->
@@ -76,11 +78,13 @@ updateOnMsg = (chn, msg) ->
 	else
 		$(domEl).removeClass("show")
 
+
 # type channel
 getType = (e) ->
 	if e.is_channel then return "channel"
 	if e.is_group then return "group"
 	if e.is_im then return "im"
+
 
 # have important messages?
 haveImportant = () ->
@@ -91,6 +95,7 @@ haveImportant = () ->
 				imp = true
 				break
 	return imp
+
 
 # get unread channels count
 unreadChannels = () ->
@@ -121,7 +126,31 @@ refreshFrequency: false
 render: (output) ->
 	console.log """got output, length: #{output.length}"""
 
-	json = JSON.parse output
+	self = this
+	err = false
+
+	# try and parse the response . this will erorr
+	# if slack api throws up . keep retrying until
+	# we get a successful response .
+
+	try
+		json = JSON.parse output
+	catch e
+		err = true
+		console.error e
+		if !retry
+			retry = setInterval((() -> self.refresh()), cfg.RETRY_INTERVAL) # retry
+			console.warn "starting retry timer"
+		return
+
+	if !err
+		if !!retry
+			clearInterval retry
+			retry = null
+	else
+		return
+
+	console.log "%cconnected", "color: green", "cleared interval (is now '#{retry}'), continuing ..."
 
 	# set important channels, ims + unread count
 	json.channels
