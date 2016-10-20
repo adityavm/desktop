@@ -18,10 +18,11 @@ Also needs a `lib/cfg.js` to run the Slack widget. The config should be defined 
 
 ```javascript
 var cfg = {
-	SLACK_TOKEN: "xxxxxxxxx...", // get one from https://api.slack.com/docs/oauth-test-tokens
-	SLACK_SELF_ID: "yyyyyyyy",
-	RETRY_INTERVAL: 15000, // time in milliseconds to wait before retrying connection
-}
+	SLACK_TOKEN: "xxxxxxxxx...", 	// get one from https://api.slack.com/docs/oauth-test-tokens
+	RETRY_INTERVAL: 15000, 				// time in milliseconds to wait before retrying connection,
+	CHANNELS: ["xxx", "yyy"],			// channels you want to be notified for
+	TYPES: ["aaa", "bbb"] 				// types of rooms to mark as very important ("im", "channel", "group")
+};
 ```
 
 ## Dependency

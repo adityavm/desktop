@@ -2,8 +2,8 @@
 # globals
 #
 
-impTypes = ["im"]
-impChannels = ["dev", "product", "design-ux", "bug-report"]
+impTypes = []
+impChannels = []
 impChannelsID = {}
 domEl = null
 socket = null
@@ -119,6 +119,8 @@ unreadMsgs = () ->
 command: (cb) ->
 	self = this
 	$.getScript "nerdbar.avm.widget/lib/cfg.js", (data) ->
+		impTypes = cfg.TYPES
+		impChannels = cfg.CHANNELS
 		self.run("""curl -s https://slack.com/api/rtm.start?token=#{cfg.SLACK_TOKEN}&simple_latest=true""", cb)
 
 refreshFrequency: false
@@ -150,7 +152,12 @@ render: (output) ->
 	else
 		return
 
-	console.log "%cconnected", "color: green", "cleared interval (is now '#{retry}'), continuing ..."
+	console.log "%cconnected", "color: #7aab7e", "cleared interval (is now '#{retry}'), continuing ..."
+
+	# assign self
+	cfg.SLACK_SELF_ID = json.self.id
+
+	console.log "%cinfo", "color: #53d1ed", "got self, setting #{cfg.SLACK_SELF_ID}"
 
 	# set important channels, ims + unread count
 	json.channels
