@@ -14,5 +14,5 @@ style: """
   line-height: 26px
 
   span
-    color: #9C9486
+    color: #aaaaaa
 """

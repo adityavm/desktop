@@ -218,7 +218,7 @@ style: """
 		color: #aaa
 
 		.channels
-			color: #9C9486
+			color: #aaaaaa
 			font-size: 14px
 
 		&.very-busy .channels
