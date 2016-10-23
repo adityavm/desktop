@@ -13,7 +13,10 @@ var nbWidget = (function(){
     nerdbarStack = window.nerdbarStack,
     widget = {
       props: [], // idx, width, visible
-      el: null,
+      get el() {
+        return document.querySelector("#" + this._el);
+      },
+      _el: null,
     };
 
   // update right pos of all widgets
@@ -73,7 +76,7 @@ var nbWidget = (function(){
 
   // save domEl for future manip
   function addDomEl(el) {
-    widget._el = el;
+    widget._el = el.getAttribute("id");
   }
 
   // set up timer to update position of all
