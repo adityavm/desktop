@@ -21,27 +21,34 @@ var nbWidget = (function(){
     for(var i = 0; i < nerdbarStack.length; i++) {
       var wdgt = nerdbarStack[i];
 
-      if (!wdgt || !wdgt.el) continue;
+      if (!wdgt) continue;
+      if (!wdgt.el) {
+        console.log("el not found " + wdgt.props[0]);
+        continue;
+      }
 
-      wdgt.el.style.right = getRight(wdgt.props[0]);
-      wdgt.el.style.display = wdgt.props[2] === false ? "none" : wdgt.el.getAttribute("display"); // revert
+      wdgt.el.style.right = getRight(wdgt.props[0]) + "px";
+
+      if (wdgt.props[2] === false) {
+        wdgt.el.classList.add("hidden");
+      } else {
+        wdgt.el.classList.remove("hidden");
+      }
     }
   }
 
   // set visibility
   function update(visible) {
-    console.info("updating", widget.props[0], "setting", visible);
-
-    widget.el.setAttribute("display", window.getComputedStyle(widget.el)); // save
+    console.info("updating " + widget.props[0] + " setting " + visible);
 
     visible = visible !== undefined ? visible : true;
     widget.props[2] = visible
-    nerdbarStack[widget[0]] = widget
+    nerdbarStack[widget.props[0]] = widget
   }
 
   // calculate right offset
   function getRight(idx) {
-    var left = 0;
+    var right = 0;
 
     idx = idx !== undefined ? idx : widget.props[0]
 
@@ -50,12 +57,13 @@ var nbWidget = (function(){
       if (!wdgt) continue;
 
       var props = wdgt.props;
-      if (props[2] == true && props[0] < widget.props[0]) {
-        left += props[1];
+
+      if (props[2] == true && props[0] < idx) {
+        right += props[1];
       }
     }
 
-    return left
+    return right
   }
 
   // get widget width
@@ -65,7 +73,7 @@ var nbWidget = (function(){
 
   // save domEl for future manip
   function addDomEl(el) {
-    widget.el = el;
+    widget._el = el;
   }
 
   // set up timer to update position of all
@@ -80,7 +88,10 @@ var nbWidget = (function(){
     visible = nerdbarStack[idx] ? nerdbarStack[idx].props[2] : visible;
 
     widget.props = [idx, width, visible];
-    nerdbarStack[idx] = widget;
+
+    if (!nerdbarStack[idx]) {
+      nerdbarStack[idx] = widget;
+    }
 
     return {
       update: update,

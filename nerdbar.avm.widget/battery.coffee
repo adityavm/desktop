@@ -34,7 +34,7 @@ command: (cb) ->
     _widget = nbWidget(widget[0], widget[1], widget[2])
     self.run(cmd, cb)
 
-refreshFrequency: "3m" # ms
+refreshFrequency: "1m" # ms
 
 render: (output) ->
   """
@@ -48,17 +48,20 @@ render: (output) ->
   """
 
 update: (output, domEl) ->
-  widthCls = getWidthCls output
+  _widget.domEl domEl
 
+  # class / text manip
+  widthCls = getWidthCls output
   $(domEl).find(".battery.icon").addClass widthCls
   $(domEl).find(".charge").text output
 
+  # get charging progress
   @run "pmset -g batt", (err, resp) ->
     out = resp.split ";"
 
-    if out[1].trim() == "charged" then _widget.update(false)
+    _widget.update(out[1].trim() != "charged")
 
-    $(domEl).find(".content").removeClass("discharging chargin finishing charge charged").addClass(out[1])
+    $(domEl).find(".content").removeClass("discharging charging finishing charge charged").addClass(out[1])
 
 afterRender: (domEl) ->
   _widget.domEl domEl
@@ -69,6 +72,9 @@ style: """
   top: 0
   height: 26px
   text-align: center
+
+  &.hidden
+    display: none
 
   span.content
     display: inline-block

@@ -17,7 +17,7 @@ command: (cb) ->
     _widget = nbWidget(widget[0], widget[1], widget[2])
     self.run(cmd, cb)
 
-refreshFrequency: 10000 # ms
+refreshFrequency: 30000 # ms
 
 render: (output) ->
   "mem <span>#{output}</span>"
@@ -33,6 +33,9 @@ style: """
   height: 26px
   line-height: 26px
   text-align: center
+
+  &.hidden
+    display: none
 
   span
     color: #aaaaaa

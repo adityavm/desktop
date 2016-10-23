@@ -42,4 +42,7 @@ style: """
   height: 26px
   line-height: 26px
   text-align: center
+
+  &.hidden
+    dispay: none
 """

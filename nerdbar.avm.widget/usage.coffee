@@ -20,71 +20,73 @@ command: (cb) ->
 refreshFrequency: "1h"
 
 render: (output) ->
-	json = JSON.parse output
-	cls = ""
+  json = JSON.parse output
+  cls = ""
 
-	if json.usageLeft < 5
-		cls = "low"
+  if json.usageLeft < 5
+    cls = "low"
 
-	if json.usageLeft >= 5
-		cls = "ok"
+  if json.usageLeft >= 5
+    cls = "ok"
 
-	if json.usageLeft > 8
-		cls = "high"
+  if json.usageLeft > 8
+    cls = "high"
 
-	"<span class='label'>gbs</span><span class='usage #{cls}'>#{json.symbol}</span><span class='usage-value'>#{json.usageLeft} gbs/day</span>"
+  "<span class='label'>gbs</span><span class='usage #{cls}'>#{json.symbol}</span><span class='usage-value'>#{json.usageLeft} gbs/day</span>"
 
 afterRender: (domEl) ->
-	_widget.domEl domEl
+  _widget.domEl domEl
 
-	$(domEl).css({ right: _widget.getRight() + "px", width: _widget.getWidth() + "px" })
+  $(domEl).css({ right: _widget.getRight() + "px", width: _widget.getWidth() + "px" })
 
-	if ($(domEl).find(".usage").hasClass("high")) then _widget.update(false);
-
+  _widget.update(!$(domEl).find(".usage").hasClass("high"))
 
 style: """
-	font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata
-	height: 26px
-	line-height: 26px
-	top: 0
-	color: #555
-	display: flex
-	user-select: none
-	justify-content: center
+  font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata
+  height: 26px
+  line-height: 26px
+  top: 0
+  color: #555
+  display: flex
+  justify-content: center
+  -webkit-user-select: none
 
-	.usage-value
-		position: absolute
-		right: 0
-		bottom: -60px
-		width: 80px
-		text-align: right
-		background-color: #111
-		padding: 0 10px
-		display: inline-block
-		opacity: 0
-		transition: opacity 0.2s
+  &.hidden
+    display: none
 
-		&:before
-			border: 5px solid #111
-			border-color: transparent transparent #111
-			content: " "
-			position: absolute
-			top: -10px
-			right: 5px
+  .usage-value
+    position: absolute
+    right: 0
+    bottom: -60px
+    width: 80px
+    text-align: right
+    background-color: #111
+    padding: 0 10px
+    display: inline-block
+    opacity: 0
+    transition: opacity 0.2s
 
-	&:active .usage-value
-		opacity: 1
+    &:before
+      border: 5px solid #111
+      border-color: transparent transparent #111
+      content: " "
+      position: absolute
+      top: -10px
+      right: 5px
 
-	span.usage
-		color: #aaa
-		font-size: 20px
+    &:active .usage-value
+      opacity: 1
 
-	span.low
-		color: #ec3f1d
+    span.usage
+      color: #aaa
+      font-size: 20px
 
-	span.ok
-		color: #ecb512
+    span.low
+      color: #ec3f1d
 
-	span.high
-		color: #88c625
+    span.ok
+      color: #ecb512
+
+    span.high
+      color: #88c625
 """

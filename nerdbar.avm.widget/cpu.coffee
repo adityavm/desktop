@@ -3,7 +3,7 @@
 #
 
 _widget = null
-widget = [5, 60, true]
+widget = [5, 70, true]
 
 #
 # widget
@@ -43,6 +43,9 @@ style: """
   height: 26px
   line-height: 26px
   text-align: center
+
+  &.hidden
+    display: none
 
   span.green
     color: #88c625
