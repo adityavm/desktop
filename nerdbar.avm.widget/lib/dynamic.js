@@ -75,6 +75,10 @@ var nbWidget = (function(){
   }
 
   return function(idx, width, visible){
+
+    // if widget already exists, keep visibility
+    visible = nerdbarStack[idx] ? nerdbarStack[idx].props[2] : visible;
+
     widget.props = [idx, width, visible];
     nerdbarStack[idx] = widget;
 
