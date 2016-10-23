@@ -1,4 +1,26 @@
 #
+# stack
+#
+
+widget = [2, 70, true]
+updateNBW = (visible = true) ->
+  window.nerdbarStack = if !window.nerdbarStack then [] else window.nerdbarStack
+  widget[2] = visible
+  nerdbarStack[widget[0]] = widget
+
+getRight = () ->
+  left = 0
+  window.nerdbarStack = if !window.nerdbarStack then [] else window.nerdbarStack
+  for i in window.nerdbarStack
+    if i and i[2] == true and i[0] < widget[0] then left += i[1]
+
+  return left
+
+getWidth = () -> widget[1]
+
+updateNBW true
+
+#
 # internal
 #
 
@@ -42,13 +64,20 @@ update: (output, domEl) ->
 
   @run "pmset -g batt", (err, resp) ->
     out = resp.split ";"
+
+    # if out[1].indexOf("charged") > -1
+    #   updateNBW(false)
+
     $(domEl).find(".content").removeClass("discharging chargin finishing charge charged").addClass(out[1])
+
+afterRender: (domEl) ->
+  $(domEl).css({ right: getRight() + "px", width: getWidth() + "px" })
 
 style: """
   font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata
   top: 0
-  right: 141.5px
   height: 26px
+  text-align: center
 
   span.content
     display: inline-block

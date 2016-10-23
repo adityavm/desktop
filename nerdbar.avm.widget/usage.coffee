@@ -1,3 +1,29 @@
+#
+# stack
+#
+
+widget = [4, 50, true]
+updateNBW = (visible = true) ->
+  window.nerdbarStack = if !window.nerdbarStack then [] else window.nerdbarStack
+  widget[2] = visible
+  nerdbarStack[widget[0]] = widget
+
+getRight = () ->
+  left = 0
+  window.nerdbarStack = if !window.nerdbarStack then [] else window.nerdbarStack
+  for i in window.nerdbarStack
+    if i and i[2] == true and i[0] < widget[0] then left += i[1]
+
+  return left
+
+getWidth = () -> widget[1]
+
+updateNBW true
+
+#
+# widget
+#
+
 command: "/usr/local/bin/node ~/dev/bitbar-plugins/node/usage.uebersicht.js"
 
 refreshFrequency: "1h"
@@ -17,20 +43,24 @@ render: (output) ->
 
 	"<span class='label'>gbs</span><span class='usage #{cls}'>#{json.symbol}</span><span class='usage-value'>#{json.usageLeft} gbs/day</span>"
 
+afterRender: (domEl) ->
+  $(domEl).css({ right: getRight() + "px", width: getWidth() + "px" })
+
+
 style: """
 	font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata
 	height: 26px
 	line-height: 26px
 	top: 0
-	right: 345px
 	color: #555
 	display: flex
 	user-select: none
+	justify-content: center
 
 	.usage-value
 		position: absolute
 		right: 0
-		bottom: -40px
+		bottom: -60px
 		width: 80px
 		text-align: right
 		background-color: #111
