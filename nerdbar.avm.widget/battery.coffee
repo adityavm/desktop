@@ -2,23 +2,8 @@
 # stack
 #
 
+_widget = null
 widget = [2, 70, true]
-updateNBW = (visible = true) ->
-  window.nerdbarStack = if !window.nerdbarStack then [] else window.nerdbarStack
-  widget[2] = visible
-  nerdbarStack[widget[0]] = widget
-
-getRight = () ->
-  left = 0
-  window.nerdbarStack = if !window.nerdbarStack then [] else window.nerdbarStack
-  for i in window.nerdbarStack
-    if i and i[2] == true and i[0] < widget[0] then left += i[1]
-
-  return left
-
-getWidth = () -> widget[1]
-
-updateNBW true
 
 #
 # internal
@@ -41,7 +26,13 @@ getWidthCls = (output) ->
 # widget
 #
 
-command: "pmset -g batt | egrep '([0-9]+\%).*' -o --colour=auto | cut -f1 -d';'"
+command: (cb) ->
+  self = this
+  cmd = "pmset -g batt | egrep '([0-9]+\%).*' -o --colour=auto | cut -f1 -d';'"
+
+  $.getScript "nerdbar.avm.widget/lib/dynamic.js", (stack) ->
+    _widget = nbWidget(widget[0], widget[1], widget[2])
+    self.run(cmd, cb)
 
 refreshFrequency: "3m" # ms
 
@@ -65,13 +56,14 @@ update: (output, domEl) ->
   @run "pmset -g batt", (err, resp) ->
     out = resp.split ";"
 
-    # if out[1].indexOf("charged") > -1
-    #   updateNBW(false)
+    if out[1].indexOf("charged") > -1
+      _widget.update(false)
 
     $(domEl).find(".content").removeClass("discharging chargin finishing charge charged").addClass(out[1])
 
 afterRender: (domEl) ->
-  $(domEl).css({ right: getRight() + "px", width: getWidth() + "px" })
+  _widget.domEl domEl
+  $(domEl).css({ right: _widget.getRight() + "px", width: _widget.getWidth() + "px" })
 
 style: """
   font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata
@@ -102,6 +94,7 @@ style: """
 
     &.charged
       color: #88c625
+      display: none
 
   span.label
     width: 15px

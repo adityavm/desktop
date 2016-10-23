@@ -2,29 +2,20 @@
 # stack
 #
 
+_widget = null
 widget = [1, 80, true]
-updateNBW = (visible = true) ->
-  window.nerdbarStack = if !window.nerdbarStack then [] else window.nerdbarStack
-  widget[2] = visible
-  nerdbarStack[widget[0]] = widget
-
-getRight = () ->
-  left = 0
-  window.nerdbarStack = if !window.nerdbarStack then [] else window.nerdbarStack
-  for i in window.nerdbarStack
-    if i and i[2] == true and i[0] < widget[0] then left += i[1]
-
-  return left
-
-getWidth = () -> widget[1]
-
-updateNBW true
 
 #
 # widget
 #
 
-command: "date +\"%a %d %b\""
+command: (cb) ->
+  self = this
+  cmd = "date +\"%a %d %b\""
+
+  $.getScript "nerdbar.avm.widget/lib/dynamic.js", (stack) ->
+    _widget = nbWidget(widget[0], widget[1], widget[2])
+    self.run(cmd, cb)
 
 refreshFrequency: 10000
 
@@ -32,7 +23,8 @@ render: (output) ->
   "#{output}"
 
 afterRender: (domEl) ->
-  $(domEl).css({ right: getRight() + "px", width: getWidth() + "px" })
+  _widget.domEl domEl
+  $(domEl).css({ right: _widget.getRight() + "px", width: _widget.getWidth() + "px" })
 
 style: """
   color: #ee6aa0

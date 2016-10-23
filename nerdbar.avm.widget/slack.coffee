@@ -2,23 +2,8 @@
 # stack
 #
 
+_widget = null
 widget = [6, 60, true]
-updateNBW = (visible = true) ->
-  window.nerdbarStack = if !window.nerdbarStack then [] else window.nerdbarStack
-  widget[2] = visible
-  nerdbarStack[widget[0]] = widget
-
-getRight = () ->
-  left = 0
-  window.nerdbarStack = if !window.nerdbarStack then [] else window.nerdbarStack
-  for i in window.nerdbarStack
-    if i and i[2] == true and i[0] < widget[0] then left += i[1]
-
-  return left
-
-getWidth = () -> widget[1]
-
-updateNBW true
 
 #
 # globals
@@ -140,10 +125,15 @@ unreadMsgs = () ->
 
 command: (cb) ->
 	self = this
+
 	$.getScript "nerdbar.avm.widget/lib/cfg.js", (data) ->
 		impTypes = cfg.TYPES
 		impChannels = cfg.CHANNELS
-		self.run("""curl -s https://slack.com/api/rtm.start?token=#{cfg.SLACK_TOKEN}&simple_latest=true""", cb)
+
+		$.getScript "nerdbar.avm.widget/lib/dynamic.js", (stack) ->
+			_widget = nbWidget.apply null, widget
+
+			self.run("""curl -s https://slack.com/api/rtm.start?token=#{cfg.SLACK_TOKEN}&simple_latest=true""", cb)
 
 refreshFrequency: false
 
@@ -220,7 +210,8 @@ render: (output) ->
 
 afterRender: (el) ->
 	domEl = el
-	$(domEl).css({ right: getRight() + "px", width: getWidth() + "px" })
+	_widget.domEl el
+	$(domEl).css({ right: _widget.getRight() + "px", width: _widget.getWidth() + "px" })
 
 style: """
 	font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata
@@ -228,7 +219,7 @@ style: """
 	top: 0
 	height: 26px
 	line-height: 26px
-	text-align: right
+	text-align: center
 	width: 65px
 	color: #555
 	opacity: 0
