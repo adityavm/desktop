@@ -5,7 +5,6 @@
 _widget = null
 widget = [3, 70, true]
 
-
 #
 # widget
 #

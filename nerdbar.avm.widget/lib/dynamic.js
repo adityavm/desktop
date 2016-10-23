@@ -21,14 +21,19 @@ var nbWidget = (function(){
     for(var i = 0; i < nerdbarStack.length; i++) {
       var wdgt = nerdbarStack[i];
 
-      if (!wdgt.el) continue;
+      if (!wdgt || !wdgt.el) continue;
 
       wdgt.el.style.right = getRight(wdgt.props[0]);
+      wdgt.el.style.display = wdgt.props[2] === false ? "none" : wdgt.el.getAttribute("display"); // revert
     }
   }
 
   // set visibility
   function update(visible) {
+    console.info("updating", widget.props[0], "setting", visible);
+
+    widget.el.setAttribute("display", window.getComputedStyle(widget.el)); // save
+
     visible = visible !== undefined ? visible : true;
     widget.props[2] = visible
     nerdbarStack[widget[0]] = widget

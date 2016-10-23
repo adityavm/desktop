@@ -56,8 +56,7 @@ update: (output, domEl) ->
   @run "pmset -g batt", (err, resp) ->
     out = resp.split ";"
 
-    if out[1].indexOf("charged") > -1
-      _widget.update(false)
+    if out[1].trim() == "charged" then _widget.update(false)
 
     $(domEl).find(".content").removeClass("discharging chargin finishing charge charged").addClass(out[1])
 
@@ -94,7 +93,6 @@ style: """
 
     &.charged
       color: #88c625
-      display: none
 
   span.label
     width: 15px

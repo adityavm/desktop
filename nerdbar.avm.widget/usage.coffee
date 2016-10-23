@@ -5,7 +5,6 @@
 _widget = null
 widget = [4, 50, true]
 
-
 #
 # widget
 #
@@ -36,8 +35,11 @@ render: (output) ->
 	"<span class='label'>gbs</span><span class='usage #{cls}'>#{json.symbol}</span><span class='usage-value'>#{json.usageLeft} gbs/day</span>"
 
 afterRender: (domEl) ->
-  _widget.domEl domEl
-  $(domEl).css({ right: _widget.getRight() + "px", width: _widget.getWidth() + "px" })
+	_widget.domEl domEl
+
+	$(domEl).css({ right: _widget.getRight() + "px", width: _widget.getWidth() + "px" })
+
+	if ($(domEl).find(".usage").hasClass("high")) then _widget.update(false);
 
 
 style: """
