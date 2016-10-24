@@ -157,7 +157,7 @@ render: (output) ->
       console.warn "starting retry timer"
     return
 
-  if !err
+  if err
     if !!retry
       clearInterval retry
       retry = null
