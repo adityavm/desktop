@@ -133,7 +133,7 @@ command: (cb) ->
     $.getScript "nerdbar.avm.widget/lib/dynamic.js", (stack) ->
       _widget = nbWidget.apply null, widget
 
-      self.run("""curl -s https://slack.com/api/rtm.start?token=#{cfg.SLACK_TOKEN}&simple_latest=true""", cb)
+      self.run """curl -s https://slack.com/api/rtm.start?token=#{cfg.SLACK_TOKEN}&simple_latest=true""", cb
 
 refreshFrequency: false
 
@@ -151,7 +151,7 @@ render: (output) ->
     json = JSON.parse output
   catch e
     err = true
-    console.error e
+    console.error "[slack] parse error", e
     if !retry
       retry = setInterval((() -> self.refresh()), cfg.RETRY_INTERVAL) # retry
       console.warn "starting retry timer"

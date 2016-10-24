@@ -14,8 +14,16 @@ command: (cb) ->
   cmd = "/usr/local/bin/node ~/dev/bitbar-plugins/node/usage.uebersicht.js"
 
   $.getScript "nerdbar.avm.widget/lib/dynamic.js", (stack) ->
-    _widget = nbWidget(widget[0], widget[1], widget[2])
-    self.run(cmd, cb)
+    _widget = nbWidget.apply null, widget
+    self.run cmd, () ->
+      output = arguments[1]
+      try
+        json = JSON.parse output
+      catch e
+        console.log "[usage] host is probably down, got", output
+        return
+
+      cb.apply null, arguments
 
 refreshFrequency: "1h"
 
