@@ -61,7 +61,9 @@ var nbWidget = (function(){
 
       var props = wdgt.props;
 
-      if (props[2] == true && props[0] < idx) {
+      // only matter if it's visible, we can see and
+      // it's to the right of the current widget
+      if (props[2] == true && wdgt.el && props[0] < idx) {
         right += props[1];
       }
     }
