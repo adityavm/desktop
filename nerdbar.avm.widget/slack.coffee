@@ -157,12 +157,12 @@ render: (output) ->
       console.warn "starting retry timer"
     return
 
-  if err
+  if !err
     if !!retry
       clearInterval retry
       retry = null
-    else
-      return
+  else
+    return
 
   console.log "%cconnected", "color: #7aab7e", "cleared interval (is now '#{retry}'), continuing ..."
 
