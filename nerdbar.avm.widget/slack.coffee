@@ -12,116 +12,272 @@ widget = [6, 60, true]
 impTypes = []
 impChannels = []
 impChannelsID = {}
-domEl = null
-socket = null
-retry = null
 
+constant =
+  SLACK:
+    CONNECTED: 1
+    DISCONNECTED: 2
+  LEVEL:
+    IMPORTANT: 1
+    VERYBUSY: 2
+    BUSY: 3
 
-# initialise socket
-init = (url) ->
-  socket = new WebSocket url
+#
+# slack connection abstraction
+#
+class SlackConnection
 
-  socket.onmessage = (ev) ->
-    typ = ev.type
-    msg = JSON.parse ev.data
+  constructor: (@state, @alive) ->
+    @state = constant.SLACK.DISCONNECTED
+    console.log("initialised new slack")
 
-    handle typ, msg
+  #
+  # slack connection state getter / setter
+  getState: () -> @state
+  setState: (state) -> @state = state
 
+  #
+  # open a new connection
+  start: (url) ->
+    @socket = new WebSocket url
 
-# handle each socket message
-handle = (typ, msg) ->
-  console.log msg
+    @socket.onmessage = (ev) =>
+      typ = ev.type
+      msg = JSON.parse ev.data
 
-	# if non-message, message from self or bot
-  if typ != "message" or msg.user == cfg.SLACK_SELF_ID or msg.bot_id then return
+      # reset
+      clearTimeout(@alive)
+      Widget.isConnected(@getState() == constant.SLACK.DISCONNECTED)
+      @setState(constant.SLACK.CONNECTED)
 
-  if msg.type == "message"
-    if msg.subtype != "message_deleted" and msg.subtype != "message_changed"
+      # if no message in 60s, connection is probably dead
+      @alive = setTimeout(() =>
+
+        @setState(constant.SLACK.DISCONNECTED)
+        Widget.isDisconnected()
+
+      , cfg.DEAD_TIMER)
+
+      @handle typ, msg
+
+  #
+  # restart connection
+  restart: () ->
+    if (@socket?)
+      @socket.close()
+      @socket = null
+      @start json.url
+
+  #
+  # handle each socket message
+  handle: (type, msg) ->
+
+    console.log msg # quick log
+
+  	# if non-message, message from self or bot
+    if type != "message" or msg.user == cfg.SLACK_SELF_ID or msg.bot_id then return
+
+    if msg.type == "message"
+      if msg.subtype != "message_deleted" and msg.subtype != "message_changed"
+        if !!impChannelsID[msg.channel]
+          impChannelsID[msg.channel].unread_count += 1
+
+    if msg.type == "channel_marked" or msg.type == "group_marked"
+      console.log """channel #{msg.channel}"""
       if !!impChannelsID[msg.channel]
-        impChannelsID[msg.channel].unread_count += 1
+        console.log """marking #{msg.unread_count}"""
+        impChannelsID[msg.channel].unread_count = msg.unread_count
+        console.log impChannelsID
 
-  if msg.type == "channel_marked" or msg.type == "group_marked"
-    console.log """channel #{msg.channel}"""
-    if !!impChannelsID[msg.channel]
-      console.log """marking #{msg.unread_count}"""
-      impChannelsID[msg.channel].unread_count = msg.unread_count
+    if msg.type == "im_marked"
+      console.log """marking im #{msg.dm_count}"""
+      impChannelsID[msg.channel].unread_count = msg.dm_count
       console.log impChannelsID
 
-  if msg.type == "im_marked"
-    console.log """marking im #{msg.dm_count}"""
-    impChannelsID[msg.channel].unread_count = msg.dm_count
-    console.log impChannelsID
+    @updateOnMsg()
 
-  updateOnMsg()
+    if msg.type != "message" then return
 
-  if msg.type != "message" then return
+  #
+  # update dom
+  updateOnMsg: (chn, msg) ->
 
+    unreadChannelsCount = if chn then chn else @unreadChannels()
+    unreadMsgsCount = if msg then msg else @unreadMsgs()
 
-# update dom
-updateOnMsg = (chn, msg) ->
-  console.log "updating dom"
+    # reset
+    Widget.reset()
 
-  els =
-    unread: $(domEl).find(".unread")
-    channels: $(domEl).find(".channels")
-    count: $(domEl).find(".count")
+    # set
+    if unreadChannelsCount > 0
+      # choose how to highlight
+      hlCls = if unreadChannelsCount > 5 or unreadMsgsCount > 20 then constant.LEVEL.VERYBUSY else constant.LEVEL.BUSY
+      hlCls = if @haveImportant() then constant.LEVEL.IMPORTANT else hlCls
 
-  unreadChannelsCount = if chn then chn else unreadChannels()
-  unreadMsgsCount = if msg then msg else unreadMsgs()
-
-  # reset
-  els.unread.removeClass("important very-busy busy")
-
-  # set
-  if unreadChannelsCount > 0
-    # choose how to highlight
-    hlCls = if unreadChannelsCount > 5 or unreadMsgsCount > 20 then "very-busy" else "busy"
-    hlCls = if haveImportant() then "important" else hlCls
-
-    els.unread.addClass(hlCls)
-    els.channels.text(unreadChannelsCount)
-    els.count.text(unreadMsgsCount)
-    $(domEl).addClass("show")
-  else
-    $(domEl).removeClass("show")
+      Widget
+        .setImportance hlCls
+        .setUnreadChannels unreadChannelsCount
+        .setUnreadMessages unreadMsgsCount
+        .show()
+    else
+      Widget.hide()
 
 
-# type channel
-getType = (e) ->
-  if e.is_channel then return "channel"
-  if e.is_group then return "group"
-  if e.is_im then return "im"
+  # type channel
+  getType: (e) ->
+    if e.is_channel then return "channel"
+    if e.is_group then return "group"
+    if e.is_im then return "im"
 
 
-# have important messages?
-haveImportant = () ->
-  imp = false
-  for ch, val of impChannelsID
-    if val.unread_count > 0
-      if impTypes.indexOf(val.type) > -1
-        imp = true
-        break
-  return imp
+  # have important messages?
+  haveImportant: () ->
+    imp = false
+    for ch, val of impChannelsID
+      if val.unread_count > 0
+        if impTypes.indexOf(val.type) > -1
+          imp = true
+          break
+    return imp
 
 
-# get unread channels count
-unreadChannels = () ->
-  sum = 0
-  for ch, val of impChannelsID
-    sum += if val.unread_count > 0 then 1 else 0
-  return sum
+  # get unread channels count
+  unreadChannels: () ->
+    sum = 0
+    for ch, val of impChannelsID
+      sum += if val.unread_count > 0 then 1 else 0
+    return sum
 
 
-# get unread messages count
-unreadMsgs = () ->
-  sum = 0
-  for ch, val of impChannelsID
-    sum += val.unread_count
-  return sum
+  # get unread messages count
+  unreadMsgs: () ->
+    sum = 0
+    for ch, val of impChannelsID
+      sum += val.unread_count
+    return sum
+
+
+#
+# uebersicht element interaction
+#
+class WidgetElement
+
+  constructor: (@self, @retry) ->
+    console.log("initialised new widgetelement")
+
+  #
+  # set the uebersicht widget element
+  setEl: (el) ->
+    @domEl = el
+    return this
+
+  #
+  # get dom element
+  getEl: () -> $(@domEl)
+
+  #
+  # set connected
+  isConnected: (wasDead) ->
+    retry = @retry
+    @retry = 0
+
+    @hide()
+    @show()
+    if (wasDead == true)
+      @getEl().find(".unread").addClass "connected"
+      setTimeout () =>
+        @getEl().find(".unread").removeClass "connected"
+      , 3000
+
+    if (retry)
+      console.log "%cconnected", "color: #7aab7e", "cleared interval (was #{retry}, is #{@retry}), continuing ..."
+
+    return this
+
+  #
+  # set disconnected
+  isDisconnected: () ->
+    @show()
+    @getEl().find(".unread").removeClass("disconnected trying").addClass("disconnected")
+
+    return """
+      slck
+      <span class="unread disconnected">
+        <span class="status">&bull;</span>
+      </span>
+    """
+
+  #
+  # set unread channels
+  setUnreadChannels: (count) ->
+    @getEl().find(".channels").text count
+    return this
+
+  #
+  # set unread messages
+  setUnreadMessages: (count) ->
+    @getEl().find(".count").text count
+    return this
+
+  #
+  # set importance
+  setImportance: (level) ->
+    cls =
+      1: "important"
+      2: "very-busy"
+      3: "busy"
+
+    @getEl().find(".unread").addClass cls[level]
+    return this
+
+  #
+  # reset all
+  reset: () ->
+    @getEl().find(".unread").removeClass("disconnected trying busy very-busy important")
+    @getEl().find(".channels").text 0
+    @getEl().find(".count").text 0
+    return this
+
+  #
+  # show the widget
+  show: () ->
+    @getEl().addClass("show")
+    return this
+
+  #
+  # hide the widget
+  hide: () ->
+    @getEl().removeClass("show")
+    return this
+
+  #
+  # refresh the widget
+  refresh: () ->
+    @self.refresh()
+    return this
+
+  #
+  # retry
+  willTry: (long) ->
+    waitTime = if long == true then (4 * cfg.RETRY_INTERVAL) else cfg.RETRY_INTERVAL
+    console.warn "starting #{waitTime / 1000}s retry timer"
+
+    @show()
+    @getEl().find(".unread").removeClass("disconnected connected").addClass("trying")
+
+    @retry = setTimeout () =>
+      @self.refresh()
+    , waitTime # retry
+
+    return this
+
 
 #
 # widget
 #
+
+Slack = null
+Widget = null
 
 command: (cb) ->
   self = this
@@ -140,8 +296,9 @@ refreshFrequency: false
 render: (output) ->
   console.log """got output, length: #{output.length}"""
 
-  self = this
+  if !Widget? then Widget = new WidgetElement this
   err = false
+  retry = false
 
 	# try and parse the response . this will erorr
 	# if slack api throws up . keep retrying until
@@ -152,23 +309,18 @@ render: (output) ->
   catch e
     err = true
     console.error "[slack] parse error", e
-    if !retry
-      retry = setInterval((() -> self.refresh()), cfg.RETRY_INTERVAL) # retry
-      console.warn "starting retry timer"
-    return
+    Widget.willTry(output.toLowerCase().indexOf("too many requests") > -1)
+    return Widget.isDisconnected()
 
   if !err
-    if !!retry
-      clearInterval retry
-      retry = null
+    Widget.isConnected()
   else
-    return
+    return Widget.isDisconnected()
 
-  console.log "%cconnected", "color: #7aab7e", "cleared interval (is now '#{retry}'), continuing ..."
+  Slack = new SlackConnection constant.SLACK.CONNECTED
 
 	# assign self
   cfg.SLACK_SELF_ID = json.self.id
-
   console.log "%cinfo", "color: #53d1ed", "got self, setting #{cfg.SLACK_SELF_ID}"
 
 	# set important channels, ims + unread count
@@ -178,7 +330,7 @@ render: (output) ->
     .concat(json.ims)
     .map((c) ->
       impChannelsID[c.id] =
-        type: getType(c)
+        type: Slack.getType(c)
         name: c.name
         unread_count: c.unread_count
     )
@@ -190,28 +342,33 @@ render: (output) ->
     .reduce(((a, b) -> a.unread_count + b.unread_count), { unread_count: 0 }).unread_count
 
 	# trigger update with forced values
-  updateOnMsg(unreadChannelsCount, unreadMsgsCount)
+  Slack.updateOnMsg(unreadChannelsCount, unreadMsgsCount)
 
 	# initialise socket
-  if (socket == null)
-    init json.url
+  if (Slack.getState() == constant.SLACK.DISCONNECTED)
+    Slack.start json.url
   else
-    socket.close()
-    socket = null
-    init json.url
+    Slack.restart()
 
   """
   slck
   <span class="unread">
     <span class="channels">0</span>
     <span class="count">0</span>
+    <span class="status">&bull;</span>
   </span>
   """
 
 afterRender: (el) ->
-  domEl = el
+
+  # save el
   _widget.domEl el
-  $(domEl).css({ right: _widget.getRight() + "px", width: _widget.getWidth() + "px" })
+  Widget.setEl el
+
+  # reflect states
+  if (!Slack? or !Slack.getState() == constant.SLACK.DISCONNECTED) then Widget.show()
+
+  Widget.getEl().css({ right: _widget.getRight() + "px", width: _widget.getWidth() + "px" })
 
 style: """
   font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata
@@ -250,4 +407,26 @@ style: """
     .count
       font-size: 10px
       color: #aaa
+
+    .status
+      display: none
+
+    &.disconnected,
+    &.trying
+    &.connected
+      .channels,
+      .count
+        display: none
+
+      .status
+        display: inline-block
+
+    &.disconnected .status
+      color: #df1d1d
+
+    &.trying .status
+      color: #53d1ed
+
+    &.connected .status
+      color: #88c625
 """
