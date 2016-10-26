@@ -180,13 +180,15 @@ class WidgetElement
   isConnected: (wasDead) ->
     retry = @retry
     @retry = 0
+    unread = @getEl().find ".unread"
 
     @hide()
-    @show()
+    unread.removeClass "disconnected trying"
     if (wasDead == true)
-      @getEl().find(".unread").addClass "connected"
+      @show()
+      unread.addClass "connected"
       setTimeout () =>
-        @getEl().find(".unread").removeClass "connected"
+        unread.removeClass "connected"
       , 3000
 
     if (retry)
