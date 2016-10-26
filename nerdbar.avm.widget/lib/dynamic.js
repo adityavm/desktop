@@ -26,7 +26,7 @@ var nbWidget = (function(){
 
       if (!wdgt) continue;
       if (!wdgt.el) {
-        console.log("el not found " + wdgt.props[0]);
+        // console.log("el not found " + wdgt.props[0]);
         continue;
       }
 
