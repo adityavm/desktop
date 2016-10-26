@@ -65,7 +65,7 @@ style: """
   .usage-value
     position: absolute
     right: 0
-    bottom: -60px
+    bottom: -40px
     width: 80px
     text-align: right
     background-color: #111
@@ -85,16 +85,16 @@ style: """
     &:active .usage-value
       opacity: 1
 
-    span.usage
-      color: #aaa
-      font-size: 20px
+  span.usage
+    color: #aaa
+    font-size: 20px
 
-    span.low
+    &.low
       color: #ec3f1d
 
-    span.ok
+    &.ok
       color: #ecb512
 
-    span.high
+    &.high
       color: #88c625
 """
