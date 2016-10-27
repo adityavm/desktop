@@ -182,9 +182,9 @@ class WidgetElement
     @retry = 0
     unread = @getEl().find ".unread"
 
-    @hide()
     unread.removeClass "disconnected trying"
     if (wasDead == true)
+      @hide()
       @show()
       unread.addClass "connected"
       setTimeout () =>
@@ -195,6 +195,12 @@ class WidgetElement
       console.log "%cconnected", "color: #7aab7e", "cleared interval (was #{retry}, is #{@retry}), continuing ..."
 
     return this
+
+  #
+  # set trying
+  isTrying: () ->
+    @show()
+    @getEl().find(".unread").removeClass("disconnected connected").addClass("trying")
 
   #
   # set disconnected
@@ -255,6 +261,12 @@ class WidgetElement
   #
   # refresh the widget
   refresh: () ->
+    if (Slack.getState() != constant.SLACK.DISCONNECTED)
+      console.error "tried to refresh when not disconnected, stopping"
+      return
+
+    console.warn "forcing refresh"
+    @isTrying()
     @self.refresh()
     return this
 
@@ -263,9 +275,6 @@ class WidgetElement
   willTry: (long) ->
     waitTime = if long == true then (4 * cfg.RETRY_INTERVAL) else cfg.RETRY_INTERVAL
     console.warn "starting #{waitTime / 1000}s retry timer"
-
-    @show()
-    @getEl().find(".unread").removeClass("disconnected connected").addClass("trying")
 
     @retry = setTimeout () =>
       @self.refresh()
@@ -370,6 +379,9 @@ afterRender: (el) ->
   # reflect states
   if (!Slack? or !Slack.getState() == constant.SLACK.DISCONNECTED) then Widget.show()
 
+  # allow quick refresh
+  Widget.getEl().unbind("click").bind("click", () -> Widget.refresh())
+
   Widget.getEl().css({ right: _widget.getRight() + "px", width: _widget.getWidth() + "px" })
 
 style: """
@@ -383,6 +395,8 @@ style: """
   color: #555
   opacity: 0
   transition: opacity 0.2s
+  -webkit-user-select: none
+  cursor: pointer
 
   &.hidden
     display: none

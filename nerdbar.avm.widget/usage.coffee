@@ -82,12 +82,14 @@ style: """
       top: -10px
       right: 5px
 
-    &:active .usage-value
-      opacity: 1
+  &:active .usage-value
+    opacity: 1
 
   span.usage
     color: #aaa
     font-size: 20px
+    position: relative
+    top: -1px
 
     &.low
       color: #ec3f1d
