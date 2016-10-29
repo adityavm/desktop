@@ -329,7 +329,7 @@ render: (output) ->
   else
     return Widget.isDisconnected()
 
-  Slack = new SlackConnection constant.SLACK.CONNECTED
+  if (!Slack?) then Slack = new SlackConnection constant.SLACK.CONNECTED
 
 	# assign self
   cfg.SLACK_SELF_ID = json.self.id
@@ -462,6 +462,11 @@ style: """
   &.disconnected,
   &.trying,
   &.connected
+    .channels,
+    .count
+      opacity: 0
+      display: none
+
     .status
       opacity: 1
       display: inline-block
