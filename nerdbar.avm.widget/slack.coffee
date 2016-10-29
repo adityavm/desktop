@@ -75,7 +75,9 @@ class SlackConnection
     console.log msg # quick log
 
   	# if non-message, message from self or bot
-    if type != "message" or msg.user == cfg.SLACK_SELF_ID or msg.bot_id then return
+    if type != "message" or msg.user == cfg.SLACK_SELF_ID or msg.bot_id
+      @updateOnMsg()
+      return
 
     if msg.type == "message"
       if msg.subtype != "message_deleted" and msg.subtype != "message_changed"
@@ -179,16 +181,15 @@ class WidgetElement
   # set connected
   isConnected: (wasDead) ->
     retry = @retry
+    el = @getEl()
     @retry = 0
-    unread = @getEl().find ".unread"
 
-    unread.removeClass "disconnected trying"
+    el.removeClass "disconnected trying"
     if (wasDead == true)
       @hide()
-      @show()
-      unread.addClass "connected"
-      setTimeout () =>
-        unread.removeClass "connected"
+      el.addClass "connected"
+      setTimeout () ->
+        el.removeClass "connected"
       , 3000
 
     if (retry)
@@ -200,17 +201,17 @@ class WidgetElement
   # set trying
   isTrying: () ->
     @show()
-    @getEl().find(".unread").removeClass("disconnected connected").addClass("trying")
+    @getEl().removeClass("disconencted connected").addClass("trying")
 
   #
   # set disconnected
   isDisconnected: () ->
     @show()
-    @getEl().find(".unread").removeClass("disconnected trying").addClass("disconnected")
+    @getEl().removeClass("disconnected trying").addClass("disconnected")
 
     return """
       slck
-      <span class="unread disconnected">
+      <span class="unread">
         <span class="status">&bull;</span>
       </span>
     """
@@ -241,7 +242,7 @@ class WidgetElement
   #
   # reset all
   reset: () ->
-    @getEl().find(".unread").removeClass("disconnected trying busy very-busy important")
+    @getEl().find(".unread").removeClass("busy very-busy important")
     @getEl().find(".channels").text 0
     @getEl().find(".count").text 0
     return this
@@ -377,7 +378,7 @@ afterRender: (el) ->
   Widget.setEl el
 
   # reflect states
-  if (!Slack? or !Slack.getState() == constant.SLACK.DISCONNECTED) then Widget.show()
+  # if (!Slack? or !Slack.getState() == constant.SLACK.DISCONNECTED) then Widget.show()
 
   # allow quick refresh
   Widget.getEl().unbind("click").bind("click", () -> Widget.refresh())
@@ -398,10 +399,19 @@ style: """
   -webkit-user-select: none
   cursor: pointer
 
+  .channels,
+  .count,
+  .status
+    opacity: 0
+    transition: opacity 0.2s
+
   &.hidden
     display: none
 
-  &.show
+  &.show,
+  &.disconnected,
+  &.connected,
+  &.trying
     opacity: 1
 
   .unread
@@ -427,22 +437,29 @@ style: """
     .status
       display: none
 
-    &.disconnected,
-    &.trying
-    &.connected
-      .channels,
-      .count
-        display: none
+  &.show
+    .channels,
+    .count
+      opacity: 1
+      display: inline-block
 
-      .status
-        display: inline-block
+  &.disconnected,
+  &.trying,
+  &.connected
+    .channels,
+    .count
+      display: none
 
-    &.disconnected .status
-      color: #df1d1d
+    .status
+      opacity: 1
+      display: inline-block
 
-    &.trying .status
-      color: #53d1ed
+  &.disconnected .status
+    color: #df1d1d
 
-    &.connected .status
-      color: #88c625
+  &.trying .status
+    color: #53d1ed
+
+  &.connected .status
+    color: #88c625
 """
