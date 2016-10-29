@@ -404,6 +404,7 @@ style: """
   .status
     opacity: 0
     transition: opacity 0.2s
+    display: none
 
   &.hidden
     display: none
@@ -420,6 +421,7 @@ style: """
     .channels
       color: #aaaaaa
       font-size: 14px
+      display: none
 
     &.very-busy .channels
       color: #ff8000
@@ -433,9 +435,23 @@ style: """
     .count
       font-size: 10px
       color: #aaa
+      display: none
 
     .status
       display: none
+
+  &.disconnected .status
+    color: #df1d1d
+
+  &.trying .status
+    color: #53d1ed
+
+  &.connected .status
+    color: #88c625
+
+  /*
+   * show hide conditions
+   */
 
   &.show
     .channels,
@@ -446,20 +462,7 @@ style: """
   &.disconnected,
   &.trying,
   &.connected
-    .channels,
-    .count
-      display: none
-
     .status
       opacity: 1
       display: inline-block
-
-  &.disconnected .status
-    color: #df1d1d
-
-  &.trying .status
-    color: #53d1ed
-
-  &.connected .status
-    color: #88c625
 """
