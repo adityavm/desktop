@@ -84,7 +84,9 @@ var nbWidget = (function(){
   // set up timer to update position of all
   // widgets
   if (!window.nerdbarInterval) {
-    window.nerdbarInterval = setInterval(updateAll, 100);
+  	setTimeout(function() { // allow ubersicht to init itself
+	    window.nerdbarInterval = setInterval(updateAll, 100);
+  	}, 1000);
   }
 
   return function(idx, width, visible){
