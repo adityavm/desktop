@@ -212,7 +212,9 @@ class WidgetElement
     return """
       slck
       <span class="unread">
-        <span class="status">&bull;</span>
+        <span class="status">
+          <span class="bad">!</span>
+        </span>
       </span>
     """
 
@@ -367,7 +369,11 @@ render: (output) ->
   <span class="unread">
     <span class="channels">0</span>
     <span class="count">0</span>
-    <span class="status">&bull;</span>
+    <span class="status">
+      <span class="good">&#10084;</span>
+      <span class="bad">!</span>
+      <span class="ok">&bull;</span>
+    </span>
   </span>
   """
 
@@ -470,4 +476,28 @@ style: """
     .status
       opacity: 1
       display: inline-block
+
+  &.connected .status
+    .good
+      opacity: 1
+      display: inline-block
+
+    .bad, .ok
+      display: none
+
+  &.disconnected .status
+    .bad
+      opacity: 1
+      display: inline-block
+
+    .good, .ok
+      display: none
+
+  &.trying .status
+    .ok
+      opacity: 1
+      display: inline-block
+
+    .good, .bad
+      display: none
 """
