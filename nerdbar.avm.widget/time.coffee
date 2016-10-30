@@ -1,4 +1,21 @@
-command: "date +%H:%M"
+#
+# stack
+#
+
+_widget = null
+widget = [0, 50, true]
+
+#
+# widget
+#
+
+command: (cb) ->
+  self = this
+  cmd = """date +%H:%M"""
+
+  $.getScript "nerdbar.avm.widget/lib/dynamic.js", (stack) ->
+    _widget = nbWidget(widget[0], widget[1], widget[2])
+    self.run(cmd, cb)
 
 refreshFrequency: 10000 # ms
 
@@ -14,11 +31,18 @@ render: (output) ->
 
 	"#{hrs}:#{min}#{suffix}"
 
+afterRender: (domEl) ->
+  _widget.domEl domEl
+  $(domEl).css({ right: _widget.getRight() + "px", width: _widget.getWidth() + "px" })
+
 style: """
   color: #94d5e4
   font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata
-  right: 15px
   top: 0
   height: 26px
   line-height: 26px
+  text-align: center
+
+  &.hidden
+    dispay: none
 """

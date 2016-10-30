@@ -1,4 +1,21 @@
-command: "ESC=`printf \"\e\"`; ps -A -o %cpu | awk '{s+=$1} END {printf(\"%.2f\",s/8);}'"
+#
+# stack
+#
+
+_widget = null
+widget = [5, 70, true]
+
+#
+# widget
+#
+
+command: (cb) ->
+  self = this
+  cmd = "ESC=`printf \"\e\"`; ps -A -o %cpu | awk '{s+=$1} END {printf(\"%.2f\",s/8);}'"
+
+  $.getScript "nerdbar.avm.widget/lib/dynamic.js", (stack) ->
+    _widget = nbWidget(widget[0], widget[1], widget[2])
+    self.run(cmd, cb)
 
 refreshFrequency: 2000
 
@@ -15,13 +32,20 @@ render: (output) ->
 
   str
 
+afterRender: (domEl) ->
+  _widget.domEl domEl
+  $(domEl).css({ right: _widget.getRight() + "px", width: _widget.getWidth() + "px" })
+
 style: """
   color: #555
   font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata
-  right: 280px
   top: 0
   height: 26px
   line-height: 26px
+  text-align: center
+
+  &.hidden
+    display: none
 
   span.green
     color: #88c625

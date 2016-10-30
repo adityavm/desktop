@@ -1,4 +1,11 @@
 #
+# stack
+#
+
+_widget = null
+widget = [2, 70, true]
+
+#
 # internal
 #
 
@@ -19,9 +26,15 @@ getWidthCls = (output) ->
 # widget
 #
 
-command: "pmset -g batt | egrep '([0-9]+\%).*' -o --colour=auto | cut -f1 -d';'"
+command: (cb) ->
+  self = this
+  cmd = "pmset -g batt | egrep '([0-9]+\%).*' -o --colour=auto | cut -f1 -d';'"
 
-refreshFrequency: "3m" # ms
+  $.getScript "nerdbar.avm.widget/lib/dynamic.js", (stack) ->
+    _widget = nbWidget(widget[0], widget[1], widget[2])
+    self.run(cmd, cb)
+
+refreshFrequency: "1m" # ms
 
 render: (output) ->
   """
@@ -35,20 +48,33 @@ render: (output) ->
   """
 
 update: (output, domEl) ->
-  widthCls = getWidthCls output
+  _widget.domEl domEl
 
+  # class / text manip
+  widthCls = getWidthCls output
   $(domEl).find(".battery.icon").addClass widthCls
   $(domEl).find(".charge").text output
 
+  # get charging progress
   @run "pmset -g batt", (err, resp) ->
     out = resp.split ";"
-    $(domEl).find(".content").removeClass("discharging chargin finishing charge charged").addClass(out[1])
+
+    _widget.update(out[1].trim() != "charged")
+
+    $(domEl).find(".content").removeClass("discharging charging finishing charge charged").addClass(out[1])
+
+afterRender: (domEl) ->
+  _widget.domEl domEl
+  $(domEl).css({ right: _widget.getRight() + "px", width: _widget.getWidth() + "px" })
 
 style: """
   font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata
   top: 0
-  right: 141.5px
   height: 26px
+  text-align: center
+
+  &.hidden
+    display: none
 
   span.content
     display: inline-block
