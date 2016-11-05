@@ -200,13 +200,11 @@ class WidgetElement
   #
   # set trying
   isTrying: () ->
-    @show()
-    @getEl().removeClass("disconencted connected").addClass("trying")
+    @getEl().removeClass("disconnected connected").addClass("trying")
 
   #
   # set disconnected
   isDisconnected: () ->
-    @show()
     @getEl().removeClass("disconnected trying").addClass("disconnected")
 
     return """
@@ -382,9 +380,6 @@ afterRender: (el) ->
   # save el
   _widget.domEl el
   Widget.setEl el
-
-  # reflect states
-  # if (!Slack? or !Slack.getState() == constant.SLACK.DISCONNECTED) then Widget.show()
 
   # allow quick refresh
   Widget.getEl().unbind("click").bind("click", () -> Widget.refresh())
