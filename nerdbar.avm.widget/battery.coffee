@@ -3,7 +3,7 @@
 #
 
 _widget = null
-widget = [2, 70, true]
+widget = [2, 90, true]
 
 #
 # internal
@@ -104,7 +104,7 @@ style: """
     width: 15px
     display: inline-block
     position: relative
-    color: #555
+    color: #333
 
     &.text
       margin-right: 3px

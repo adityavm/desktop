@@ -63,7 +63,7 @@ style: """
     color: #555
     z-index: 2
     height: 26px
-    background-color: #111
+    background-color: #141414
     line-height: 26px
     min-width: 200px
     white-space: nowrap
@@ -81,6 +81,6 @@ style: """
     opacity: 0
 
   span.window
-    color: #aaa
+    color: #888573
     min-width: 200px
 """

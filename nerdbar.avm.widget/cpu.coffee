@@ -3,7 +3,7 @@
 #
 
 _widget = null
-widget = [5, 70, true]
+widget = [5, 90, true]
 
 #
 # widget
@@ -37,7 +37,7 @@ afterRender: (domEl) ->
   $(domEl).css({ right: _widget.getRight() + "px", width: _widget.getWidth() + "px" })
 
 style: """
-  color: #555
+  color: #333
   font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata
   top: 0
   height: 26px
@@ -48,7 +48,7 @@ style: """
     display: none
 
   span.green
-    color: #88c625
+    color: #888573
 
   span.orange
     color: #ff8000

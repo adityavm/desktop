@@ -3,7 +3,7 @@
 #
 
 _widget = null
-widget = [6, 60, true]
+widget = [6, 80, true]
 
 #
 # globals
@@ -104,7 +104,8 @@ class SlackConnection
   # update dom
   updateOnMsg: (chn, msg) ->
 
-    unreadChannelsCount = if chn then chn else @unreadChannels()
+    unreadChannelsCount = if chn then chn else @unreadChannelsCount()
+    unreadChannelsList = @unreadChannelsList()
     unreadMsgsCount = if msg then msg else @unreadMsgs()
 
     # reset
@@ -118,7 +119,7 @@ class SlackConnection
 
       Widget
         .setImportance hlCls
-        .setUnreadChannels unreadChannelsCount
+        .setUnreadChannels(unreadChannelsCount, unreadChannelsList)
         .setUnreadMessages unreadMsgsCount
         .show()
     else
@@ -144,11 +145,20 @@ class SlackConnection
 
 
   # get unread channels count
-  unreadChannels: () ->
+  unreadChannelsCount: () ->
     sum = 0
     for ch, val of impChannelsID
       sum += if val.unread_count > 0 then 1 else 0
     return sum
+
+
+  # get unread channels list
+  unreadChannelsList: () ->
+    list = []
+    for ch, val of impChannelsID
+      if val.unread_count > 0
+        list.push if val.name then val.name else "im"
+    return list.join ","
 
 
   # get unread messages count
@@ -218,8 +228,10 @@ class WidgetElement
 
   #
   # set unread channels
-  setUnreadChannels: (count) ->
-    @getEl().find(".channels").text count
+  setUnreadChannels: (count, channels) ->
+    @getEl().find(".channels")
+      .text count
+      .attr("unread-channels", channels)
     return this
 
   #
@@ -242,7 +254,9 @@ class WidgetElement
   #
   # reset all
   reset: () ->
-    @getEl().find(".unread").removeClass("busy very-busy important")
+    @getEl().find(".unread")
+      .removeClass("busy very-busy important")
+      .attr("unread-channels", null)
     @getEl().find(".channels").text 0
     @getEl().find(".count").text 0
     return this
@@ -394,7 +408,7 @@ style: """
   line-height: 26px
   text-align: center
   width: 65px
-  color: #555
+  color: #333
   opacity: 0
   transition: opacity 0.2s
   -webkit-user-select: none

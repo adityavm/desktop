@@ -21,7 +21,7 @@ render: (output) ->
 
 style: """
   font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata
-  color: #aaa
+  color: #888573
   height: 26px
   line-height: 26px
   top: 0

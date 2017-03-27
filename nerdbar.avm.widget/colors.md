@@ -1,6 +1,7 @@
 # Colours
 
 ## neutral
+neutral     : 888573
 value       : aaaaaa
 label       : 555555
 blue        : 53d1ed

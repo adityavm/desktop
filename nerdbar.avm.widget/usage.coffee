@@ -3,7 +3,7 @@
 #
 
 _widget = null
-widget = [4, 50, true]
+widget = [4, 70, true]
 
 #
 # widget
@@ -54,7 +54,7 @@ style: """
   height: 26px
   line-height: 26px
   top: 0
-  color: #555
+  color: #333
   display: flex
   justify-content: center
   -webkit-user-select: none
@@ -90,12 +90,13 @@ style: """
     font-size: 20px
     position: relative
     top: -1px
+    left: 3px
 
     &.low
       color: #ec3f1d
 
     &.ok
-      color: #ecb512
+      color: #888573
 
     &.high
       color: #88c625
