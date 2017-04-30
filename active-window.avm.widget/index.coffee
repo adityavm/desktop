@@ -114,8 +114,8 @@ style: """
         content: ""
         border-left: 1px solid currentColor
         position: relative
-        left: 3px
-        top: -3px
+        left: 4px
+        top: -4px
         height: 15px
         display: inline-block
 
