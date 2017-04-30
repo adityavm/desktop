@@ -12,6 +12,8 @@ outputFmt = (output) ->
   title = split[2].trim()
   titleSubs = if title.length > options.cutOff then "..." + title.substr title.length - options.cutOff, title.length else title
 
+  titleSubs = titleSubs.replace(/🔊/g, "<div class='icon icon-speaker'><div class='lines'></div></div>")
+
   windowSpan = "<span class='window'>#{win}</span>"
   titleSpan = "<span class='title'>#{titleSubs}</span>"
 
@@ -79,6 +81,43 @@ style: """
 
   .empty
     opacity: 0
+
+  .icon
+    width: 10px
+    height: 10px
+    background-color: currentColor
+    position: relative
+    top: 8px
+    display: inline-block
+    transform: scale(0.45)
+
+    &:after
+      content: ""
+      width: 0px
+      height: 0px
+      border-width: 10px
+      border-style: solid
+      border-color: transparent currentColor transparent transparent
+      position: absolute
+      left: -8px
+      top: -5px
+      display: inline-block
+
+    .lines
+      border-left: 1px solid currentColor
+      position: relative
+      left: 15px
+      height: 10px
+      display: inline-block
+
+      &:after
+        content: ""
+        border-left: 1px solid currentColor
+        position: relative
+        left: 3px
+        top: -3px
+        height: 15px
+        display: inline-block
 
   span.window
     color: #888573
