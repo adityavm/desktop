@@ -122,8 +122,10 @@ class SlackConnection
         .setUnreadChannels(unreadChannelsCount, unreadChannelsList)
         .setUnreadMessages unreadMsgsCount
         .show()
+      _widget.update true
     else
       Widget.hide()
+      _widget.update false
 
 
   # type channel
@@ -325,6 +327,7 @@ render: (output) ->
   if !Widget? then Widget = new WidgetElement this
   err = false
   retry = false
+  json = {}
 
 	# try and parse the response . this will erorr
 	# if slack api throws up . keep retrying until
