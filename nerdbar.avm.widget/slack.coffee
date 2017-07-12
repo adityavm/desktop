@@ -167,7 +167,7 @@ class SlackConnection
   unreadMsgs: () ->
     sum = 0
     for ch, val of impChannelsID
-      sum += val.unread_count
+      sum += if val.unread_count > 0 then val.unread_count else 0
     return sum
 
 

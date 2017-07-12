@@ -62,7 +62,7 @@ style: """
     top: 0
     left: 10px
     font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata
-    color: #555
+    color: #888573
     z-index: 2
     height: 26px
     background-color: #141414
@@ -120,6 +120,9 @@ style: """
         display: inline-block
 
   span.window
-    color: #888573
+    color: #555
     min-width: 200px
+
+  span.divider
+    color: #555
 """
