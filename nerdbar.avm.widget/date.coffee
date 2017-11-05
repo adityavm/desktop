@@ -20,7 +20,9 @@ command: (cb) ->
 refreshFrequency: 10000
 
 render: (output) ->
-  "#{output}"
+  out = output.split " "
+  day = out[0].toLowerCase()
+  """<span class="day #{day}">#{out[0]}</span> #{out[1..2].join(" ")}"""
 
 afterRender: (domEl) ->
   _widget.domEl domEl
@@ -36,4 +38,12 @@ style: """
 
   &.hidden
     display: none
+
+  span.day
+    &.fri
+      color: #ecb512
+
+    &.sat,
+    &.sun
+      color: #b5c625
 """

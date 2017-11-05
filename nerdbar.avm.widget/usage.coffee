@@ -4,6 +4,7 @@
 
 _widget = null
 widget = [4, 70, true]
+AVERAGE = 16
 
 #
 # widget
@@ -31,13 +32,13 @@ render: (output) ->
   json = JSON.parse output
   cls = ""
 
-  if json.usageLeft < 5
+  if json.usageLeft < AVERAGE
     cls = "low"
 
-  if json.usageLeft >= 5
+  if json.usageLeft >= AVERAGE
     cls = "ok"
 
-  if json.usageLeft > 8
+  if json.usageLeft > (AVERAGE * 1.6)
     cls = "high"
 
   "<span class='label'>gbs</span><span class='usage #{cls}'>#{json.symbol}</span><span class='usage-value'>#{json.usageLeft} gbs/day</span>"
@@ -47,7 +48,7 @@ afterRender: (domEl) ->
 
   $(domEl).css({ right: _widget.getRight() + "px", width: _widget.getWidth() + "px" })
 
-  _widget.update(!$(domEl).find(".usage").hasClass("high"))
+  _widget.update !$(domEl).find(".usage").hasClass("high") # hide if usage in control
 
 style: """
   font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata
@@ -87,7 +88,7 @@ style: """
 
   span.usage
     color: #aaa
-    font-size: 20px
+    font-size: 10px
     position: relative
     top: -1px
     left: 3px

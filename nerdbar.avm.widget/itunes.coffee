@@ -4,8 +4,9 @@
 #
 
 _widget = null
-widget = [7, 250, true]
+widget = [6, 250, true]
 domElem = null
+SONGNAMELIMIT = 15
 
 #
 # widget
@@ -27,7 +28,7 @@ render: (output) ->
     out = JSON.parse output
   catch e
 
-  song = out[0]
+  song = out[0] + if out[0].length > SONGNAMELIMIT then "&hellip;" else ""
   artist = out[1]
   if song == "" and artist == ""
     _widget.update false

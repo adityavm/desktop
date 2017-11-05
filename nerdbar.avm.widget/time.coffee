@@ -24,7 +24,7 @@ render: (output) ->
 	hrs = parseInt time[0]
 	min = parseInt time[1]
 
-	suffix = if hrs > 12 then "p" else "a"
+	suffix = if hrs > 11 then "p" else "a"
 
 	hrs = if hrs > 12 then hrs - 12 else hrs
 	min = if min < 10 then "0#{min}" else min

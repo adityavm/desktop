@@ -3,7 +3,7 @@
 #
 
 _widget = null
-widget = [6, 80, true]
+widget = [5, 80, true]
 
 #
 # globals
