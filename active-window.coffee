@@ -1,7 +1,7 @@
 # public
 
 options =
-  refresh: 500
+  refresh: 1000
   cutOff: 60
 
 # internal
@@ -25,7 +25,7 @@ outputFmt = (output) ->
 
 # widget
 
-command: "osascript active-window.avm.widget/lib/window_title.scpt"
+command: "osascript lib/window_title.scpt"
 
 refreshInterval: options.refresh,
 
@@ -38,7 +38,7 @@ update: (output, domEl) ->
   el = $(domEl).find(".content")
 
   if (win == "Finder" and title == "")
-    el.addClass("empty").html("")
+    el.addClass("transit").html("")
     return
 
   el.removeClass("empty")
@@ -57,15 +57,15 @@ update: (output, domEl) ->
   if el.hasClass("transit") then setTimeout (() -> el.removeClass("transit")), 200
 
 style: """
+  position: absolute
+  bottom: 5px
+  left: 15px
+
   .content
-    position: absolute
-    top: 0
-    left: 10px
     font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata
-    color: #888573
+    color: #aaa
     z-index: 2
     height: 26px
-    background-color: #141414
     line-height: 26px
     min-width: 200px
     white-space: nowrap
@@ -120,9 +120,11 @@ style: """
         display: inline-block
 
   span.window
-    color: #555
+    color: rgba(#aaa, 0.75)
     min-width: 200px
+    opacity: 0.75
 
   span.divider
-    color: #555
+    color: rgba(#aaa, 0.5)
+    opacity: 0.25
 """

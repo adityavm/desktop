@@ -6,7 +6,8 @@
 _widget = null
 widget = [6, 250, true]
 domElem = null
-SONGNAMELIMIT = 15
+SONGNAMELIMIT = 20
+ARTISTNAMELIMIT = 10
 
 #
 # widget
@@ -16,7 +17,7 @@ command: (cb) ->
   self = this
   cmd = """osascript -e 'if application "iTunes" is running then tell application "iTunes" to if player state is playing then "[\\\"" & name of current track & "\\\",\\\"" & artist of current track & "\\\"]"'"""
 
-  $.getScript "nerdbar.avm.widget/lib/dynamic.js", (stack) ->
+  $.getScript "lib/dynamic.js", (stack) ->
     _widget = nbWidget(widget[0], widget[1], widget[2])
     self.run(cmd, cb)
 
@@ -28,8 +29,8 @@ render: (output) ->
     out = JSON.parse output
   catch e
 
-  song = out[0] + if out[0].length > SONGNAMELIMIT then "&hellip;" else ""
-  artist = out[1]
+  song = out[0].substr(0, SONGNAMELIMIT) + if out[0].length > SONGNAMELIMIT then "&hellip;" else ""
+  artist = out[1].substr(0, ARTISTNAMELIMIT) + if out[1].lenght > ARTISTNAMELIMIT then "&hellip;" else ""
   if song == "" and artist == ""
     _widget.update false
   else

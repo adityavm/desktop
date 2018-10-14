@@ -3,7 +3,7 @@
 #
 
 _widget = null
-widget = [2, 90, true]
+widget = [2, 70, true]
 
 #
 # internal
@@ -22,6 +22,12 @@ getWidthCls = (output) ->
 
   widthCls
 
+getMeter = (output) ->
+  outputInt = parseInt output
+
+  outArray = [1..Math.floor(outputInt / 20)]
+  return outArray.map((i) -> "•").join("")
+
 #
 # widget
 #
@@ -30,7 +36,7 @@ command: (cb) ->
   self = this
   cmd = "pmset -g batt | egrep '([0-9]+\%).*' -o --colour=auto | cut -f1 -d';'"
 
-  $.getScript "nerdbar.avm.widget/lib/dynamic.js", (stack) ->
+  $.getScript "lib/dynamic.js", (stack) ->
     _widget = nbWidget(widget[0], widget[1], widget[2])
     self.run(cmd, cb)
 
@@ -43,7 +49,7 @@ render: (output) ->
       <span class='battery icon'></span>
       <span class='text'>bat</span>
     </span>
-    <span class='charge'>#{output}</span>
+    <span class='charge'>#{getMeter(output)}</span>
   </span>
   """
 
@@ -53,13 +59,13 @@ update: (output, domEl) ->
   # class / text manip
   widthCls = getWidthCls output
   $(domEl).find(".battery.icon").addClass widthCls
-  $(domEl).find(".charge").text output
+  $(domEl).find(".charge").text getMeter(output)
 
   # get charging progress
   @run "pmset -g batt", (err, resp) ->
     out = resp.split ";"
 
-    _widget.update(out[1].trim() != "charged")
+    # _widget.update(out[1].trim() != "charged")
 
     $(domEl).find(".content").removeClass("discharging charging finishing charge charged").addClass(out[1])
 
@@ -69,7 +75,7 @@ afterRender: (domEl) ->
 
 style: """
   font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata
-  top: 0
+  bottom: 5px
   height: 26px
   text-align: center
 
@@ -84,12 +90,10 @@ style: """
     padding: 0 3px 0 5px
 
     &.discharging
-      background-color: #ecb512
-      color: #333
+      color: #aaa
 
       .label
         background-color: #ecb512
-        color: rgba(#000, 0.25)
 
     &.charging
       color: #ecb512
@@ -102,9 +106,9 @@ style: """
 
   span.label
     width: 15px
-    display: inline-block
+    display: none
     position: relative
-    color: #333
+    color: rgba(#aaa, 0.5)
 
     &.text
       margin-right: 3px

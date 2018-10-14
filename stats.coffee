@@ -3,7 +3,7 @@
 #
 
 _widget = null
-widget = [3, 80, true]
+widget = [3, 60, true]
 maxHeight = 13
 
 #
@@ -14,7 +14,7 @@ command: (cb) ->
   self = this
   cmd = "echo $(ps -A -o %mem | awk '{s+=$1} END {print \"\" s}'),$(ps -A -o %cpu | awk '{s+=$1} END {printf(\"%.2f\",s/8);}')"
 
-  $.getScript "nerdbar.avm.widget/lib/dynamic.js", (stack) ->
+  $.getScript "lib/dynamic.js", (stack) ->
     _widget = nbWidget(widget[0], widget[1], widget[2])
     self.run(cmd, cb)
 
@@ -28,14 +28,13 @@ render: (output) ->
     when cpu > 50 then "veryhigh"
     else "low"
   memC = switch
-    when mem > 70 then "high"
-    when mem > 90 then "veryhigh"
+    when mem < 70 then "high"
+    when mem < 50 then "veryhigh"
     else "low"
 
   """
-  stat
-  <span class="#{cpuC}" style="height:#{cpu*0.4}%"></span>
-  <span class="#{memC}" style="height:#{mem*0.4}%"></span>
+  <span class="#{cpuC}" style="height:#{cpu*0.3}%"></span>
+  <span class="#{memC}" style="height:#{mem*0.3}%"></span>
   """
 
 afterRender: (domEl) ->
@@ -43,9 +42,9 @@ afterRender: (domEl) ->
   $(domEl).css({ right: _widget.getRight() + "px", width: _widget.getWidth() + "px" })
 
 style: """
-  color: #333
+  color: rgba(#aaa, 0.5)
   font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata
-  top: 0
+  bottom: 5px
   height: 26px
   line-height: 26px
   text-align: center
@@ -59,7 +58,7 @@ style: """
   span
     margin-bottom: 10px
     width: 4px
-    background-color: #888573
+    background-color: #aaa
     margin-left: 5px
 
     &.high

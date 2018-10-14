@@ -310,11 +310,11 @@ Widget = null
 command: (cb) ->
   self = this
 
-  $.getScript "nerdbar.avm.widget/lib/cfg.js", (data) ->
+  $.getScript "lib/cfg.js", (data) ->
     impTypes = cfg.TYPES
     impChannels = cfg.CHANNELS
 
-    $.getScript "nerdbar.avm.widget/lib/dynamic.js", (stack) ->
+    $.getScript "lib/dynamic.js", (stack) ->
       _widget = nbWidget.apply null, widget
 
       self.run """curl -s https://slack.com/api/rtm.start?token=#{cfg.SLACK_TOKEN}&simple_latest=true""", cb
@@ -406,7 +406,7 @@ afterRender: (el) ->
 style: """
   font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata
   right: 395px
-  top: 0
+  top: 3px
   height: 26px
   line-height: 26px
   text-align: center

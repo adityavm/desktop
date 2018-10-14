@@ -14,7 +14,7 @@ command: (cb) ->
   self = this
   cmd = "/usr/local/bin/node ~/dev/bitbar-plugins/node/usage.uebersicht.js"
 
-  $.getScript "nerdbar.avm.widget/lib/dynamic.js", (stack) ->
+  $.getScript "lib/dynamic.js", (stack) ->
     _widget = nbWidget.apply null, widget
     self.run cmd, () ->
       output = arguments[1]
@@ -54,8 +54,8 @@ style: """
   font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata
   height: 26px
   line-height: 26px
-  top: 0
-  color: #333
+  top: 3px
+  color: #666
   display: flex
   justify-content: center
   -webkit-user-select: none
@@ -97,7 +97,7 @@ style: """
       color: #ec3f1d
 
     &.ok
-      color: #888573
+      color: #aaa
 
     &.high
       color: #88c625
