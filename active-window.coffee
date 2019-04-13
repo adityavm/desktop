@@ -1,7 +1,7 @@
 # public
 
 options =
-  refresh: 1000
+  refresh: 2500
   cutOff: 60
 
 # internal
@@ -10,9 +10,11 @@ outputFmt = (output) ->
   split = output.match /([^,]+),(.+)/
   win = split[1].trim()
   title = split[2].trim()
-  titleSubs = if title.length > options.cutOff then "..." + title.substr title.length - options.cutOff, title.length else title
 
-  titleSubs = titleSubs.replace(/🔊/g, "<div class='icon icon-speaker'><div class='lines'></div></div>")
+  # Make window title useful
+  titleSubs = title.replace(new RegExp("\s?-?.?#{win}.?-?\s?", "ig"), "") # remove app name
+  titleSubs = if titleSubs.length > options.cutOff then "..." + titleSubs.substr titleSubs.length - options.cutOff, titleSubs.length else titleSubs
+  titleSubs = titleSubs.replace(/🔊/g, "<div class='icon icon-speaker'><div class='lines'></div></div>") # remove speaker icon
 
   windowSpan = "<span class='window'>#{win}</span>"
   titleSpan = "<span class='title'>#{titleSubs}</span>"
@@ -58,11 +60,11 @@ update: (output, domEl) ->
 
 style: """
   position: absolute
-  bottom: 5px
-  left: 15px
+  bottom: 17px
+  left: 25px
 
   .content
-    font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata
+    font: 12px "Dank Mono", -apple-system, Osaka-Mono, Hack, Inconsolata
     color: #aaa
     z-index: 2
     height: 26px

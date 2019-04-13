@@ -32,9 +32,16 @@ render: (output) ->
     when mem < 50 then "veryhigh"
     else "low"
 
+  # bars
+  # """
+  # <span class="#{cpuC}" style="height:#{cpu*0.3}%"></span>
+  # <span class="#{memC}" style="height:#{mem*0.3}%"></span>
+  # """
+
+  # minimalist
   """
-  <span class="#{cpuC}" style="height:#{cpu*0.3}%"></span>
-  <span class="#{memC}" style="height:#{mem*0.3}%"></span>
+  <span class="bullet #{cpuC}">&bull;</span>
+  <span class="bullet #{memC}">&bull;</span>
   """
 
 afterRender: (domEl) ->
@@ -44,7 +51,7 @@ afterRender: (domEl) ->
 style: """
   color: rgba(#aaa, 0.5)
   font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata
-  bottom: 5px
+  bottom: 17px
   height: 26px
   line-height: 26px
   text-align: center
@@ -61,12 +68,26 @@ style: """
     background-color: #aaa
     margin-left: 5px
 
+    &.bullet
+      margin-bottom: 0
+      background-color: transparent
+      color: #aaa
+
     &.high
       background-color: #ff8000
+
+      &.bullet
+        background-color: transparent
+        color: #ff8000
 
     &.veryhigh
       background-color: #ec3f1d
 
+      &.bullet
+        background-color: transparent
+        color: #ec3f1d
+
     & + span
       margin-left: 2px
+
 """

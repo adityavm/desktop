@@ -4,10 +4,12 @@ render: (output) ->
   ""
 
 style: """
-  top: 0
-  left: 0
-  height: 26px
-  width: 100%
-  background-color: #141414
+  bottom: 10px
+  left: 10px
+  height: 40px
+  width: calc(100% - 20px)
+  background-color: #232021
   z-index: -1
+  -webkit-backdrop-filter: blur(5px)
+  border-radius: 5px
 """

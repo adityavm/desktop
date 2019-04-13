@@ -28,6 +28,10 @@ getMeter = (output) ->
   outArray = [1..Math.floor(outputInt / 20)]
   return outArray.map((i) -> "•").join("")
 
+isLow = (output) ->
+  outputInt = parseInt output
+  return outputInt < 50
+
 #
 # widget
 #
@@ -40,7 +44,7 @@ command: (cb) ->
     _widget = nbWidget(widget[0], widget[1], widget[2])
     self.run(cmd, cb)
 
-refreshFrequency: "1m" # ms
+refreshFrequency: 60000 # ms
 
 render: (output) ->
   """
@@ -49,7 +53,7 @@ render: (output) ->
       <span class='battery icon'></span>
       <span class='text'>bat</span>
     </span>
-    <span class='charge'>#{getMeter(output)}</span>
+    <span class='charge' title="#{output}">#{getMeter(output)}</span>
   </span>
   """
 
@@ -68,6 +72,7 @@ update: (output, domEl) ->
     # _widget.update(out[1].trim() != "charged")
 
     $(domEl).find(".content").removeClass("discharging charging finishing charge charged").addClass(out[1])
+    $(domEl).find(".content").removeClass("low").addClass(if isLow(output) then "low" else "")
 
 afterRender: (domEl) ->
   _widget.domEl domEl
@@ -75,7 +80,7 @@ afterRender: (domEl) ->
 
 style: """
   font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata
-  bottom: 5px
+  bottom: 17px
   height: 26px
   text-align: center
 
@@ -87,7 +92,7 @@ style: """
     line-height: 26px
     height: 26px
     color: #fff
-    padding: 0 3px 0 5px
+    padding: 0 5px
 
     &.discharging
       color: #aaa
@@ -96,13 +101,21 @@ style: """
         background-color: #ecb512
 
     &.charging
-      color: #ecb512
+      color: #ecb512 !important
 
     &.finishing.charge
       color: #b5c625
 
     &.charged
       color: #88c625
+
+    &.low
+      background-color: red
+      color: #111
+
+      &.charging
+        background-color: transparent
+        color: red
 
   span.label
     width: 15px

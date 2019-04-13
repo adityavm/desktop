@@ -10,6 +10,8 @@
 
 _widget = null
 widget = [0, 170, true]
+DAY_BG = ""
+NIGHT_BG = ""
 
 #
 # widget
@@ -19,11 +21,15 @@ command: (cb) ->
   self = this
   cmd = "osascript lib/window_title.scpt" # """date +%H:%M"""
 
-  $.getScript "lib/dynamic.js", (stack) ->
-    _widget = nbWidget(widget[0], widget[1], widget[2])
-    self.run(cmd, cb)
+  $.getScript "lib/cfg.js", () ->
+    $.getScript "lib/dynamic.js", () ->
+      DAY_BG = cfg.DAY_BG
+      NIGHT_BG = cfg.NIGHT_BG
+      _widget = nbWidget(widget[0], widget[1], widget[2])
 
-refreshFrequency: 1000 # ms
+      self.run(cmd, cb)
+
+refreshFrequency: 5000 # ms
 
 getDate: (isBig) ->
   out = new Date()
@@ -68,6 +74,24 @@ getFullHtml: (isBig) ->
   <div class="date">#{@getDate(isBig)}</div>
   """
 
+setWallpaper: (current, run) ->
+  currentHour = (new Date()).getHours()
+  currentWallpaper = (current || "").substr("Macintosh HD:Users:aditya:Pictures:Wallpapers:".length).trim()
+
+  if current >= 7 and current < 18
+    if currentWallpaper == NIGHT_BG
+      return DAY_BG
+    else
+      return null
+
+  if currentHour >= 18
+    if currentWallpaper == DAY_BG
+      return NIGHT_BG
+    else
+      return null
+
+  return DAY_BG
+
 render: (output) ->
   split = output.match /([^,]+),(.+)/
   win = split[1].trim()
@@ -76,11 +100,13 @@ render: (output) ->
 
   _widget.update not isBig
 
+  # """
+  # <div class="big-time">
+  #   #{@getFullHtml(isBig)}
+  #   <span class="greeting">#{@getGreeting()}</span>
+  # </div>
   """
-  <div class="big-time">
-    #{@getFullHtml(isBig)}
-    <span class="greeting">#{@getGreeting()}</span>
-  </div>
+  <div class="big-time"><span class="greeting">#{@getGreeting()}</span></div>
  	<div class="small-time">#{@getFullHtml(false)}</div>
   """
 
@@ -88,9 +114,14 @@ afterRender: (domEl) ->
   _widget.domEl domEl
   $(domEl).css({ right: _widget.getRight() + "px", width: _widget.getWidth() + "px" })
 
+  # @run "osascript lib/background_image.scpt", (err, stdout) =>
+  #   wallpaper = @setWallpaper stdout
+  #   if wallpaper
+  #     @run """osascript lib/background_image.scpt "#{wallpaper}" """
+
 style: """
-  font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata
-  bottom: 5px
+  font: 12px "Dank Mono", -apple-system, Osaka-Mono, Hack, Inconsolata
+  bottom: 17px
   height: 26px
   line-height: 26px
   text-align: center
@@ -108,8 +139,11 @@ style: """
     font-family: "Helvetica Neue"
     font-weight: 300
     position: fixed
-    bottom: 20px
-    left: 20px
+    bottom: 23px
+    /*
+    bottom: 17px;
+    */
+    left: 25px
     font-size: 96px
     opacity: 0
     transition: opacity 0.4s
@@ -128,8 +162,12 @@ style: """
       font-size: 48px
 
     .greeting
+      /*
       margin-top: 5px
       font-size: 24px
+      */
+
+      font: 12px "Dank Mono", -apple-system, Osaka-Mono, Hack, Inconsolata
 
   .small-time
     color: #aaa
