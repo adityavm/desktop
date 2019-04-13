@@ -1,0 +1,191 @@
+<head>
+  <title></title>
+  <style>
+    :root {
+      --font: Dank;
+      --accent: #f4484d;
+
+      --dk-grey-1: #1e1e1e;
+      --dk-grey-2: #222;
+      --dk-grey-3: #282828;
+
+      --md-grey-1: #999;
+
+      --lt-grey-1: #f9f9f9;
+      --lt-grey-2: #e5e5e5;
+      --lt-grey-3: #d9d9d9;
+    }
+
+    @keyframes fadeIn {
+      from  { opacity: 0; }
+      to    { opacity: 1; }
+    }
+
+    @font-face {
+      font-family: Dank;
+      src: url(/Users/aditya/Library/Fonts/DankMono-Regular.ttf);
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background-image: linear-gradient(0deg, var(--lt-grey-1), var(--lt-grey-2));
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topline {
+      display: flex;
+      height: calc(2vh);
+      width: 100%;
+      flex: none;
+    }
+
+    .color {
+      flex: 1;
+      display: inline-block;
+    }
+
+    .color1 { background-color: #ff6188; }
+    .color2 { background-color: #a9dc76; }
+    .color3 { background-color: #ffd866; }
+    .color4 { background-color: #fc9867; }
+    .color5 { background-color: #ab9df2; }
+    .color6 { background-color: #78dce8; }
+
+    .input-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+    }
+
+    form#start {
+      position: relative;
+    }
+
+    .input-container input[type="text"] {
+      border: none;
+      border-bottom-width: 0;
+      border-bottom-style: solid;
+      border-bottom-color: transparent;
+      background-image: linear-gradient(0deg, var(--lt-grey-3), var(--lt-grey-2));
+      border-radius: 3px;
+      padding: 20px;
+      font: 14px Dank;
+      width: 500px;
+      transition-duration: 0.3s;
+      opacity: 0;
+      animation: fadeIn 0.3s linear 0.1s 1 forwards;
+    }
+
+    .input-container input[type="text"]:focus {
+      border-bottom-width: 2px;
+      border-bottom-color: var(--md-grey-1);
+      outline: none
+    }
+
+    .input-container input[type="submit"] {
+      display: none;
+    }
+
+    img.favicon {
+      position: absolute;
+      right: 15px;
+      top: 25px;
+    }
+
+    img.favicon.hide { display: none; }
+
+    body.sunset input[type="text"] {
+      background-image: linear-gradient(0deg, var(--dk-grey-1), var(--dk-grey-2));
+      color: var(--lt-grey-1);
+    }
+
+    body.sunset {
+      background-image: linear-gradient(0deg, var(--dk-grey-2), var(--dk-grey-3));
+    }
+  </style>
+  <script>
+    function handleFormSubmit(e) {
+      e.preventDefault();
+
+      const input = document.querySelector("input");
+      window.location = input.value.match(/\w\.\w{2,3}/)
+        ? input.value
+        : `https://duckduckgo.com/?q=${input.value}&t=osx&ia=web`
+    }
+
+    function updateFavicon() {
+      const input = document.querySelector("input");
+      const img = document.querySelector("img.favicon")
+
+      if (input.value.match(/\w\.\w{2,3}/)) {
+        img.src = `https://www.google.com/s2/favicons?domain=${input.value}`;
+        img.classList.remove("hide");
+      } else {
+        img.src = "";
+        img.classList.add("hide")
+      }
+    }
+  </script>
+</head>
+<body>
+  <div class="topline">
+    <span class="color1 color"></span>
+    <span class="color2 color"></span>
+    <span class="color3 color"></span>
+    <span class="color4 color"></span>
+    <span class="color5 color"></span>
+    <span class="color6 color"></span>
+  </div>
+  <div class="input-container">
+    <form id="start">
+      <input placeholder="The world's your oyster!" type="text" />
+      <input type="submit" />
+      <img src="" class="favicon" />
+    </form>
+  </div>
+
+  <script>
+    const getGreeting = () => {
+      const time = (new Date()).getHours();
+      let greet;
+
+      if (time >= 0 && time < 6)
+        greet = "You should sleep"
+
+      if (time >= 6 && time < 12)
+        greet = "Good Morning"
+
+      if (time >= 12 && time < 17)
+        greet = "Good Afternoon"
+
+      if (time >= 17 && time < 24)
+        greet = "Good Evening"
+
+      return `${greet}, Aditya!`
+    }
+
+    document.querySelector("title").innerHTML = getGreeting();
+    document.forms.start.addEventListener("submit", handleFormSubmit);
+
+    (() => {
+      const input = document.querySelector("input")
+      const focus = () => input.focus();
+
+      input.addEventListener("keyup", updateFavicon);
+      window.addEventListener("focus", focus);
+      document.body.addEventListener("click", focus);
+      focus();
+    })();
+
+    (() => {
+      // Set page theme for time of day
+      const time = new Date();
+      const body = document.body;
+      body.classList[time.getHours() > 18 && time.getHours() <= 6 ? "add" : "remove"]("sunset");
+    })();
+  </script>
+</body>

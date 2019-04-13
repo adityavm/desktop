@@ -180,6 +180,19 @@ style: """
     .date
       order: -1
 
+    .time
+      display: inline-flex
+      align-items: center
+      justify-content: center
+      background-color: #f4484d
+      border-radius: 0 5px 5px 0
+      position: relative
+      top: -14px
+      right: -21px
+      color: #111
+      width: 60px
+      height: 40px
+
   &.hidden
     .big-time
       opacity: 1
