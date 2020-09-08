@@ -3,7 +3,7 @@
 #
 
 _widget = null
-widget = [3, 60, true]
+widget = [3, 35, false]
 maxHeight = 13
 
 #
@@ -51,13 +51,17 @@ afterRender: (domEl) ->
 style: """
   color: rgba(#aaa, 0.5)
   font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata
-  bottom: 17px
-  height: 26px
+  bottom: 10px
+  height: 40px
   line-height: 26px
   text-align: center
   display: flex
-  align-items: flex-end
+  align-items: center
   justify-content: center
+  background-color: #232021
+  border-radius: 5px
+  padding: 0 10px;
+  margin-right: 10px
 
   &.hidden
     display: none
@@ -66,7 +70,6 @@ style: """
     margin-bottom: 10px
     width: 4px
     background-color: #aaa
-    margin-left: 5px
 
     &.bullet
       margin-bottom: 0
@@ -74,18 +77,18 @@ style: """
       color: #aaa
 
     &.high
-      background-color: #ff8000
+      background-color: #feb46b
 
       &.bullet
         background-color: transparent
-        color: #ff8000
+        color: #feb46b
 
     &.veryhigh
-      background-color: #ec3f1d
+      background-color: #eb806b
 
       &.bullet
         background-color: transparent
-        color: #ec3f1d
+        color: #eb806b
 
     & + span
       margin-left: 2px

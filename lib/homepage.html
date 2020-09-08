@@ -113,7 +113,7 @@
 
       const input = document.querySelector("input");
       window.location = input.value.match(/\w\.\w{2,3}/)
-        ? input.value
+        ? `http://${input.value}`
         : `https://duckduckgo.com/?q=${input.value}&t=osx&ia=web`
     }
 
@@ -185,7 +185,7 @@
       // Set page theme for time of day
       const time = new Date();
       const body = document.body;
-      body.classList[time.getHours() > 18 && time.getHours() <= 6 ? "add" : "remove"]("sunset");
+      body.classList[time.getHours() > 18 || time.getHours() <= 6 ? "add" : "remove"]("sunset");
     })();
   </script>
 </body>

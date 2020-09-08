@@ -1,0 +1,3 @@
+[submodule "lib/8bitdash"]
+	path = lib/8bitdash
+	url = git@github.com:8bitdash/8bitdash.github.io.git
