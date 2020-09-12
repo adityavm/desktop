@@ -1,8 +1,10 @@
 import { run, css } from "uebersicht";
+import * as Icons from "./lib/icons";
 
 const options = {
   refresh: 2500,
   cutOff: 60,
+  display: 1,
 };
 
 const outputFmt = ({ app, title }) => {
@@ -59,16 +61,32 @@ export const command = async dispatch => {
     windowJSON = {};
   }
   if (windowJSON.display !== 1) {
-    winddowJSON = {};
+    windowJSON = {};
   }
 
-  const spaces = await run("/usr/local/bin/yabai -m query --spaces");
+  let spacesJSON;
+  let activeSpace;
+  try {
+    const spaces = await run("/usr/local/bin/yabai -m query --spaces");
+    spacesJSON = JSON.parse(spaces);
+  } catch (e) {
+    spacesJSON = [];
+  }
+
+  let windowsJSON;
+  try {
+    const windows = await run("/usr/local/bin/yabai -m query --windows");
+    windowsJSON = JSON.parse(windows);
+  } catch (e) {
+    windowsJSON = [];
+  }
 
   dispatch({
     type: "SET_STATE",
     app: windowJSON.app,
     title: windowJSON.title,
-    spaces,
+    spaces: spacesJSON,
+    visibleWindows: windowsJSON,
   });
 }
 
@@ -78,32 +96,48 @@ export const updateState = (event, prevState) => {
       app: event.app,
       title: event.title,
       spaces: event.spaces,
+      visibleWindows: event.visibleWindows,
     };
   }
   return prevState;
 };
 
-export const render = ({ app, title, spaces }) => {
+export const GetAppIcons = ({ visibleWindows, isFocused }) => {
+  const seen = [];
+  return visibleWindows.map(win => {
+    const app = win.app.replaceAll(" ", "");
+    if (seen.indexOf(app) > -1) return () => null;
+    seen.push(app);
+    const Icon = Icons[app] ? Icons[app] : () => null;
+    return <Icon className={`${appIcon} ${isFocused ? activeAppIcon : null} ${app}`} />
+  });
+}
+
+export const render = ({ app, title, spaces, visibleWindows }) => {
   const [fmtApp, fmtTitle] = outputFmt({ app, title });
   const isEmpty = !fmtApp && !fmtTitle;
 
   if (!spaces || typeof spaces === "undefined") return null;
 
-  const spacesArr = JSON.parse(spaces).filter(spc => spc.display === 1);
+  const spacesArr = spaces.filter(spc => spc.display === options.display);
 
   return (
     <div className={parent}>
       <div className={spacesContainer}>
-        {spacesArr.map((spc, i) => (
-          <span key={spc.id} className={`${space} ${spc.focused ? activeSpace : null}`}>
-            {i !== 0 && (
-              <span className={spaceDivider}>&nbsp;</span>
-            )}
-            <span className={`${spaceLabel} ${spc.focused ? spaceActiveLabel : ``}`}>
-             {spc.label || spc.index}
+        {spacesArr.map((spc, i) => {
+          const label = spc.label || String(spc.index);
+          const windows = visibleWindows.filter(win => win.space === spc.index);
+          return (
+            <span key={spc.id} className={`${space} ${spc.focused ? activeSpace : null}`}>
+              <span className={`${spaceLabel} ${spc.focused ? spaceActiveLabel : ``}`}>
+                {spc.focused ? label : label.charAt(0)}
+              </span>
+              <span className={appIcons}>
+                <GetAppIcons visibleWindows={windows} isFocused={spc.focused === 1} />
+              </span>
             </span>
-          </span>
-        ))}
+          );
+        })}
       </div>
       <div className={`${contentStyles} ${isEmpty ? emptyStyles : ``}`}>
         {!isEmpty
@@ -121,15 +155,15 @@ export const render = ({ app, title, spaces }) => {
           : (
             getGreeting()
           )}
-        </div>
       </div>
-    );
+    </div>
+  );
 };
 
 export const className = `
   position: absolute;
   bottom: 10px;
-  left: 60px;
+  left: 50px;
   height: 40px;
 `;
 
@@ -149,24 +183,24 @@ const spacesContainer = css({
 const space = css({
   display: "inline-flex",
   alignItems: "center",
+  justifyContent: "center",
   height: "40px",
   transition: "0.3s",
   position: "relative",
+  flex: "none",
+  padding: "0 7px",
   ":first-child": {
-    paddingLeft: "10px",
     borderRadius: "4px 0 0 4px",
   },
   ":last-child": {
-    paddingRight: "10px",
     borderRadius: "0 4px 4px 0",
   },
   "&:before": {
     position: "absolute",
-    top: "20px",
-    left: "18px",
-    width: "30px",
+    top: 0,
+    left: 0,
+    width: "100%",
     height: "100%",
-    transform: "translate(-50%, -50%) skew(-26deg)",
     zIndex: -1,
     transition: "color 0.3s, background-color 0.3s",
   },
@@ -175,38 +209,61 @@ const space = css({
 const activeSpace = css({
   "&:before": {
     content: '""',
-    // backgroundColor: "#ee6aa0",
-    backgroundColor: "#2f2f2f",
-    color: "#ee6aa0",
+    backgroundColor: "#333",
+    color: "transparent",
   },
 });
 
-const spaceDivider = css({
-  paddding: "0 5px",
-});
+const spaceDivider = css({});
 
 const spaceLabel = css({
   color: "rgba(160, 160, 160, 0.5)",
   backgroundColor: "transparent",
   display: "inline-flex",
-  justifyContent: "center",
   alignItems: "center",
   lineHeight: "16px",
-  width: "20px",
   height: "20px",
   borderRadius: "50%",
   transition: "0.3s",
 });
 
 const spaceActiveLabel = css({
-  color: "#999",
-  fontWeight: 600,
+  color: "#ee6aa0",
+});
+
+const appIcons = css({
+  display: "flex",
+});
+
+const appIcon = css({
+  width: "12px",
+  marginLeft: "5px",
+  opacity: 0.5,
+  path: {
+    fill: "#777",
+  },
+  "&.FirefoxDeveloperEdition": {
+    path: {
+      fill: "#94d5e4",
+    }
+  }
+});
+
+const activeAppIcon = css({
+  path: {
+    fill: "#ee6aa0",
+  },
+  "&.FirefoxDeveloperEdition": {
+    path: {
+      fill: "#94d5e4",
+    }
+  },
+  opacity: 1,
 });
 
 const windowStyles = css({
   color: "rgba(#aaa, 0.75)",
   opacity: "0.75",
-  textTransform: "uppercase",
   color: "#aaa",
 });
 
@@ -228,7 +285,7 @@ const contentStyles = css({
   alignItems: "center",
   justifyContent: "flex-start",
   padding: "0px 20px",
-  marginLeft: "15px",
+  marginLeft: "10px",
 });
 
 const dividerStyles = css({

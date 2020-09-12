@@ -11,9 +11,9 @@ const toggle = currentStatus => async () => {
 
 export const command = dispatch => {
   run("defaults -currentHost read ~/Library/Preferences/ByHost/com.apple.notificationcenterui doNotDisturb")
-  .then(output => {
-    dispatch({ type: "SET_OUTPUT", data: output });
-  })
+    .then(output => {
+      dispatch({ type: "SET_OUTPUT", data: output });
+    })
 }
 
 export const refreshFrequency = 5000;
@@ -49,7 +49,7 @@ export const box = css({
   justifyContent: `center`,
   backgroundColor: `#232021`,
   borderRadius: `5px`,
-  padding: `0 15px`,
+  padding: `0 10px`,
   cursor: "pointer",
   transition: "color 0.2s",
 });
