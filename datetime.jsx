@@ -1,16 +1,29 @@
+const Vibrant = require("node-vibrant")
+
 /*
  * Shows the date and time
  * Shows big datetime in the top left when no windows are
  * active otherwise shows small datetime in the top right
 */
 
-import { css } from "uebersicht";
+import { run, css } from "uebersicht";
 
-export const command = "date +%H:%M"
+export const command = async dispatch => {
+  const output = await run("date +%H:%M");
+  const fileName = await run("cat ./lib/backgroundFile");
+
+  Vibrant.from(fileName).getPalette().then(palette => {
+    dispatch({
+      type: "SET_DATA",
+      time: output,
+      bgColor: palette.DarkMuted.getHex(),
+    });
+  });
+};
 
 export const refreshFrequency = 50000;
 
-const getDate = isBig => {
+const getDate = ({ time, isBig }) => {
   const out = new Date();
   const dayString = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][out.getDay()].substr(0, 3);
   const dateString = out.getDate();
@@ -24,7 +37,7 @@ const getDate = isBig => {
   );
 }
 
-const getTime = isBig => {
+const getTime = ({ time, isBig }) => {
   const timeObj = new Date();
   let hrs = timeObj.getHours();
   let min = timeObj.getMinutes();
@@ -42,49 +55,49 @@ const getTime = isBig => {
   );
 }
 
-const getFullHtml = isBig => (
+const getFullHtml = ({ time, bgColor, isBig }) => (
   <div className={isBig ? bigTime : smallTime}>
     <div className={text}>
       <span className={`${cross} ${crossLeft}`}>
         <svg className={crossSvg} width="3" height="3" viewBox="0 0 3 3" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="1" height="1" fill="#666"/>
-          <rect x="1" y="1" width="1" height="1" fill="#666"/>
-          <rect y="2" width="1" height="1" fill="#666"/>
-          <rect x="2" width="1" height="1" fill="#666"/>
-          <rect x="2" y="2" width="1" height="1" fill="#666"/>
+          <rect width="1" height="1" fill="#666" />
+          <rect x="1" y="1" width="1" height="1" fill="#666" />
+          <rect y="2" width="1" height="1" fill="#666" />
+          <rect x="2" width="1" height="1" fill="#666" />
+          <rect x="2" y="2" width="1" height="1" fill="#666" />
         </svg>
       </span>
       <span className={`${cross} ${crossRight}`}>
         <svg className={crossSvg} width="3" height="3" viewBox="0 0 3 3" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="1" height="1" fill="#666"/>
-          <rect x="1" y="1" width="1" height="1" fill="#666"/>
-          <rect y="2" width="1" height="1" fill="#666"/>
-          <rect x="2" width="1" height="1" fill="#666"/>
-          <rect x="2" y="2" width="1" height="1" fill="#666"/>
+          <rect width="1" height="1" fill="#666" />
+          <rect x="1" y="1" width="1" height="1" fill="#666" />
+          <rect y="2" width="1" height="1" fill="#666" />
+          <rect x="2" width="1" height="1" fill="#666" />
+          <rect x="2" y="2" width="1" height="1" fill="#666" />
         </svg>
       </span>
-      {getDate(isBig)}
+      {getDate({ time, isBig })}
     </div>
-    <div className={text}>
+    <div className={`${text} ${bgcolor(bgColor)}`}>
       <span className={`${cross} ${crossLeft}`}>
         <svg className={crossSvg} width="3" height="3" viewBox="0 0 3 3" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="1" height="1" fill="#ffc65baa"/>
-          <rect x="1" y="1" width="1" height="1" fill="#ffc65baa"/>
-          <rect y="2" width="1" height="1" fill="#ffc65baa"/>
-          <rect x="2" width="1" height="1" fill="#ffc65baa"/>
-          <rect x="2" y="2" width="1" height="1" fill="#ffc65baa"/>
+          <rect width="1" height="1" fill="#ffc65baa" />
+          <rect x="1" y="1" width="1" height="1" fill="#ffc65baa" />
+          <rect y="2" width="1" height="1" fill="#ffc65baa" />
+          <rect x="2" width="1" height="1" fill="#ffc65baa" />
+          <rect x="2" y="2" width="1" height="1" fill="#ffc65baa" />
         </svg>
       </span>
       <span className={`${cross} ${crossRight}`}>
         <svg className={crossSvg} width="3" height="3" viewBox="0 0 3 3" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="1" height="1" fill="#ffc65baa"/>
-          <rect x="1" y="1" width="1" height="1" fill="#ffc65baa"/>
-          <rect y="2" width="1" height="1" fill="#ffc65baa"/>
-          <rect x="2" width="1" height="1" fill="#ffc65baa"/>
-          <rect x="2" y="2" width="1" height="1" fill="#ffc65baa"/>
+          <rect width="1" height="1" fill="#ffc65baa" />
+          <rect x="1" y="1" width="1" height="1" fill="#ffc65baa" />
+          <rect y="2" width="1" height="1" fill="#ffc65baa" />
+          <rect x="2" width="1" height="1" fill="#ffc65baa" />
+          <rect x="2" y="2" width="1" height="1" fill="#ffc65baa" />
         </svg>
       </span>
-      {getTime(isBig)}
+      {getTime({ time, isBig })}
     </div>
   </div>
 );
@@ -99,6 +112,10 @@ export const className = `
   text-align: center;
   color: #aaa;
 `;
+
+const bgcolor = color => css({
+  backgroundColor: color,
+});
 
 const cross = css({
   position: "absolute",
@@ -176,7 +193,6 @@ const timeSmall = css({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  backgroundColor: "#333",
   position: "relative",
   color: "#ffc65b",
   width: "80px",
@@ -220,6 +236,16 @@ const smallTime = css({
   width: "100%",
 });
 
-export const render = ({ output }) => {
-  return getFullHtml(false);
+export const updateState = (event, prevState) => {
+  if (event.type === "SET_DATA") {
+    return {
+      time: event.time,
+      bgColor: event.bgColor,
+    };
+  }
+  return prevState;
 }
+
+export const render = ({ time, bgColor }) => {
+  return getFullHtml({ time, bgColor, isBig: false });
+};

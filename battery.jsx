@@ -1,4 +1,4 @@
-import { range } from "lodash";
+const { range } = require("lodash");
 import { css } from "uebersicht";
 
 // width class based on output value
@@ -43,20 +43,20 @@ export const render = ({ output }) => (
   <div className={content}>
     <span className={`${cross} ${crossLeft}`}>
       <svg className={crossSvg} width="3" height="3" viewBox="0 0 3 3" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="1" height="1" fill="#666"/>
-        <rect x="1" y="1" width="1" height="1" fill="#666"/>
-        <rect y="2" width="1" height="1" fill="#666"/>
-        <rect x="2" width="1" height="1" fill="#666"/>
-        <rect x="2" y="2" width="1" height="1" fill="#666"/>
+        <rect width="1" height="1" fill="#666" />
+        <rect x="1" y="1" width="1" height="1" fill="#666" />
+        <rect y="2" width="1" height="1" fill="#666" />
+        <rect x="2" width="1" height="1" fill="#666" />
+        <rect x="2" y="2" width="1" height="1" fill="#666" />
       </svg>
     </span>
     <span className={`${cross} ${crossRight}`}>
       <svg className={crossSvg} width="3" height="3" viewBox="0 0 3 3" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="1" height="1" fill="#666"/>
-        <rect x="1" y="1" width="1" height="1" fill="#666"/>
-        <rect y="2" width="1" height="1" fill="#666"/>
-        <rect x="2" width="1" height="1" fill="#666"/>
-        <rect x="2" y="2" width="1" height="1" fill="#666"/>
+        <rect width="1" height="1" fill="#666" />
+        <rect x="1" y="1" width="1" height="1" fill="#666" />
+        <rect y="2" width="1" height="1" fill="#666" />
+        <rect x="2" width="1" height="1" fill="#666" />
+        <rect x="2" y="2" width="1" height="1" fill="#666" />
       </svg>
     </span>
     {getMeter(output)}

@@ -55,7 +55,7 @@ const getGreeting = () => {
 export const command = async dispatch => {
   let windowJSON;
   try {
-    const windows = await run("/usr/local/bin/yabai -m query --windows --window");
+    const windows = await run(`/usr/local/bin/yabai -m query --windows --window | jq '.[select(.[].display == ${options.display})]'`);
     windowJSON = JSON.parse(windows);
   } catch (e) {
     windowJSON = {};
@@ -127,10 +127,12 @@ export const render = ({ app, title, spaces, visibleWindows }) => {
         {spacesArr.map((spc, i) => {
           const label = spc.label || String(spc.index);
           const windows = visibleWindows.filter(win => win.space === spc.index);
+          const isStacked = spc.type === "stack";
           return (
             <span key={spc.id} className={`${space} ${spc.focused ? activeSpace : null}`}>
               <span className={`${spaceLabel} ${spc.focused ? spaceActiveLabel : ``}`}>
                 {spc.focused ? label : label.charAt(0)}
+                {isStacked && <span>°</span>}
               </span>
               <span className={appIcons}>
                 <GetAppIcons visibleWindows={windows} isFocused={spc.focused === 1} />

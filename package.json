@@ -1,6 +1,8 @@
 {
   "dependencies": {
     "chalk": "^2.4.2",
-    "lodash": "^4.17.20"
+    "lodash": "^4.17.20",
+    "node-vibrant": "^3.1.5",
+    "seedrandom": "^3.0.5"
   }
 }
