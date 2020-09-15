@@ -1,11 +1,13 @@
 import { run, css } from "uebersicht";
 import * as Icons from "./lib/icons";
+const Vibrant = require("node-vibrant");
 
 const options = {
-  refresh: 2500,
   cutOff: 60,
   display: 2,
 };
+
+export const refreshFrequency = false;
 
 const outputFmt = ({ app, title }) => {
   if (!app && !title) return ["", ""];
@@ -55,12 +57,10 @@ const getGreeting = () => {
 export const command = async dispatch => {
   let windowJSON;
   try {
-    const windows = await run(`/usr/local/bin/yabai -m query --windows --window | jq '.[select(.[].display == ${options.display})]'`);
+    const windows = await run(`/usr/local/bin/yabai -m query --windows | /usr/local/bin/jq '.[] | [{app: .app, display: .display, title: .title, focused: .focused}] | select(.[].focused == 1 and .[].display == ${options.display}) | .[0]'`);
     windowJSON = JSON.parse(windows);
   } catch (e) {
-    windowJSON = {};
-  }
-  if (windowJSON.display !== 1) {
+    console.log(e);
     windowJSON = {};
   }
 
@@ -81,12 +81,16 @@ export const command = async dispatch => {
     windowsJSON = [];
   }
 
-  dispatch({
-    type: "SET_STATE",
-    app: windowJSON.app,
-    title: windowJSON.title,
-    spaces: spacesJSON,
-    visibleWindows: windowsJSON,
+  const fileName = await run("cat ./lib/backgroundFile");
+  Vibrant.from(fileName).getPalette().then(palette => {
+    dispatch({
+      type: "SET_STATE",
+      app: windowJSON.app,
+      title: windowJSON.title,
+      spaces: spacesJSON,
+      visibleWindows: windowsJSON,
+      emptyBackground: palette.LightVibrant._rgb || [255, 255, 255],
+    });
   });
 }
 
@@ -97,6 +101,7 @@ export const updateState = (event, prevState) => {
       title: event.title,
       spaces: event.spaces,
       visibleWindows: event.visibleWindows,
+      emptyBackground: event.emptyBackground,
     };
   }
   return prevState;
@@ -113,7 +118,7 @@ export const GetAppIcons = ({ visibleWindows, isFocused }) => {
   });
 }
 
-export const render = ({ app, title, spaces, visibleWindows }) => {
+export const render = ({ app, title, spaces, visibleWindows, emptyBackground }) => {
   const [fmtApp, fmtTitle] = outputFmt({ app, title });
   const isEmpty = !fmtApp && !fmtTitle;
 
@@ -141,7 +146,7 @@ export const render = ({ app, title, spaces, visibleWindows }) => {
           );
         })}
       </div>
-      <div className={`${contentStyles} ${isEmpty ? emptyStyles : ``}`}>
+      <div className={`${contentStyles} ${isEmpty ? emptyStyles(emptyBackground) : ``}`}>
         {!isEmpty
           ? (
             <div>
@@ -296,8 +301,8 @@ const dividerStyles = css({
   margin: "0 5px",
 });
 
-const emptyStyles = css({
+const emptyStyles = color => css({
   backdropFilter: "blur(10px)",
-  backgroundColor: "rgba(204, 204, 204, 0.5)",
+  backgroundColor: `rgba(${color.join(",")}, 0.5)`,
   color: "#fff",
 });
