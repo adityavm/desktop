@@ -26,6 +26,7 @@ export const className = css({
   left: 0,
   width: "100%",
   height: "100%",
+  backgroundColor: "#000",
 })
 
 const background = bgUrl => css({
@@ -33,4 +34,5 @@ const background = bgUrl => css({
   height: "100%",
   backgroundImage: `url('${bgUrl}')`,
   backgroundSize: "cover",
+  borderRadius: "4px",
 });
