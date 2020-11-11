@@ -17,7 +17,11 @@ export const updateState = (event, prevState) => {
 };
 
 export const render = ({ bgUrl }) => {
-  return <div className={background(bgUrl)} />;
+  return (
+    <div className={background(bgUrl)}>
+      <div className={desktopIcons} />
+      </div>
+    );
 };
 
 export const className = css({
@@ -35,4 +39,14 @@ const background = bgUrl => css({
   backgroundImage: `url('${bgUrl}')`,
   backgroundSize: "cover",
   borderRadius: "4px",
+});
+
+const desktopIcons = css({
+  position: "absolute",
+  right: "0px",
+  top: "0px",
+  height: "100%",
+  width: "170px",
+  borderRadius: "0px 4px 4px 0",
+  backdropFilter: "blur(5px)",
 });

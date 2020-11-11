@@ -111,12 +111,23 @@ export const GetAppIcons = ({ visibleWindows, isFocused }) => {
   const seen = [];
   return visibleWindows.map(win => {
     const app = win.app.replaceAll(" ", "");
+    const isFront = win.focused === 1;
     if (seen.indexOf(app) > -1) return () => null;
     seen.push(app);
-    const Icon = Icons[app] ? Icons[app] : () => null;
-    return <Icon className={`${appIcon} ${isFocused ? activeAppIcon : null} ${app}`} />
+    return (
+      <RenderIcon
+        app={app}
+        className={`${isFocused ? activeAppIcon : null} ${isFront ? frontAppIcon : null}`}
+      />
+    )
   });
 }
+
+export const RenderIcon = ({ className, app }) => {
+  app = app.replaceAll(" ", "");
+  const Icon = Icons[app] ? Icons[app] : () => null;
+  return <Icon className={`${appIcon} ${app} ${className}`} />
+};
 
 export const render = ({ app, title, spaces, visibleWindows, emptyBackground }) => {
   const [fmtApp, fmtTitle] = outputFmt({ app, title });
@@ -125,6 +136,7 @@ export const render = ({ app, title, spaces, visibleWindows, emptyBackground }) 
   if (!spaces || typeof spaces === "undefined") return null;
 
   const spacesArr = spaces.filter(spc => spc.display === options.display);
+  const Icon = Icons[app] ? Icons[app] : () => null;
 
   return (
     <div className={parent}>
@@ -149,8 +161,11 @@ export const render = ({ app, title, spaces, visibleWindows, emptyBackground }) 
       <div className={`${contentStyles} ${isEmpty ? emptyStyles(emptyBackground) : ``}`}>
         {!isEmpty
           ? (
-            <div>
-              <span className={windowStyles}>{fmtApp}</span>
+            <div className={activeWindowTitleContainer}>
+              <span className={windowStyles}>
+                <RenderIcon app={app} className={windowAppIcon} />
+                {fmtApp}
+              </span>
               {fmtTitle && (
                 <span className={titleStyles}>
                   <span className={dividerStyles}>/</span>
@@ -168,10 +183,11 @@ export const render = ({ app, title, spaces, visibleWindows, emptyBackground }) 
 };
 
 export const className = `
+  left: 0;
+  top: 0;
   position: absolute;
-  bottom: 10px;
-  left: 50px;
-  height: 40px;
+  width: 100%;
+  height: 100%;
 `;
 
 const parent = css({
@@ -185,13 +201,17 @@ const spacesContainer = css({
   backdropFilter: "blur(10px)",
   borderRadius: "4px",
   overflow: "hidden",
+  position: "absolute",
+  bottom: "5px",
+  left: "50px",
+  height: "35px",
 });
 
 const space = css({
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
-  height: "40px",
+  height: "35px",
   transition: "0.3s",
   position: "relative",
   flex: "none",
@@ -235,16 +255,16 @@ const spaceLabel = css({
 });
 
 const spaceActiveLabel = css({
-  color: "#ee6aa0",
+  color: "#b79dc4",
 });
 
 const appIcons = css({
   display: "flex",
+  marginLeft: "5px",
 });
 
 const appIcon = css({
   width: "12px",
-  marginLeft: "5px",
   opacity: 0.5,
   path: {
     fill: "#777",
@@ -253,12 +273,22 @@ const appIcon = css({
     path: {
       fill: "#94d5e4",
     }
-  }
+  },
+  padding: "4px",
+  height: "12px",
+});
+
+const windowAppIcon = css({
+  marginRight: "10px",
+  marginLeft: "0",
+  path: {
+    fill: "#aaa",
+  },
 });
 
 const activeAppIcon = css({
   path: {
-    fill: "#ee6aa0",
+    fill: "#b79dc4",
   },
   "&.FirefoxDeveloperEdition": {
     path: {
@@ -268,10 +298,22 @@ const activeAppIcon = css({
   opacity: 1,
 });
 
+const frontAppIcon = css({
+  backgroundColor: "#262626",
+  borderRadius: "4px",
+});
+
+const activeWindowTitleContainer = css({
+  display: "flex",
+});
+
 const windowStyles = css({
   color: "rgba(#aaa, 0.75)",
   opacity: "0.75",
   color: "#aaa",
+  display: "inline-flex",
+  alignItems: "center",
+  height: "100%",
 });
 
 const titleStyles = css({});
@@ -286,13 +328,15 @@ const contentStyles = css({
   opacity: 1,
   transition: "opacity 0.2s, background-color 0.2s, color 0.2s",
   backgroundColor: "#232021",
-  height: "40px",
+  height: "35px",
   borderRadius: "5px",
   display: "flex",
   alignItems: "center",
   justifyContent: "flex-start",
-  padding: "0px 20px",
-  marginLeft: "10px",
+  padding: "0px 10px",
+  position: "absolute",
+  left: "10px",
+  top: "5px",
 });
 
 const dividerStyles = css({

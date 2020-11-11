@@ -35,14 +35,14 @@ export const render = output => (
 );
 
 export const className = `
-  bottom: 10px;
+  bottom: 5px;
   left: 10px;
   z-index: 1;
 `;
 
 export const box = css({
   font: `12px -apple-system, Osaka-Mono, Hack, Inconsolata;`,
-  height: `40px`,
+  height: `35px`,
   lineHeight: `26px`,
   textAlign: `center`,
   display: `flex`,

@@ -105,9 +105,9 @@ const getFullHtml = ({ time, bgColor, isBig }) => (
 export const className = `
   font: 12px "Dank Mono", -apple-system, Osaka-Mono, Hack, Inconsolata;
   display: flex;
-  bottom: 10px;
+  bottom: 5px;
   right: 10px;
-  height: 42px;
+  height: 35px;
   line-height: 26px;
   text-align: center;
   color: #aaa;
@@ -161,7 +161,7 @@ const date = css({
 
 const dateSmall = css`
   ${date};
-  width: 100px;
+  width: 90px;
 `;
 
 const dateBig = css`
@@ -195,7 +195,7 @@ const timeSmall = css({
   justifyContent: "center",
   position: "relative",
   color: "#ffc65b",
-  width: "80px",
+  width: "70px",
   /* height: "40px", */
   /* borderBottom: "2px solid #ffc65baa", */
   flex: "none",

@@ -66,9 +66,9 @@ export const render = ({ output }) => (
 
 export const className = `
   font: 12px -apple-system, Osaka-Mono, Hack, Inconsolata;
-  bottom: 10px;
-  right: 205px;
-  height: 40px;
+  top: 5px;
+  right: 5px;
+  height: 35px;
   text-align: center;
   background-color: #232021;
   border-radius: 5px;
